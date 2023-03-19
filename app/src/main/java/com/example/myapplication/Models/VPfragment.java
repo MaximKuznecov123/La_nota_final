@@ -53,7 +53,7 @@ public class VPfragment extends Fragment {
         int difference = page - VPadapter.defaultpage;
         c.add(Calendar.DATE, difference);
 
-        curdate = new SimpleDateFormat("ddMMyy").format(c.getTime());
+        curdate = new SimpleDateFormat("yyMMdd").format(c.getTime());
 
         taskAdapter = new TaskAdapter2(db, activity, curdate);
     }

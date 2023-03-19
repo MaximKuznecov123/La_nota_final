@@ -6,11 +6,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
+import com.example.myapplication.Adapters.VPadapter;
 import com.example.myapplication.Models.TaskModel2;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,7 +31,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
     private static final String CREATE_TODO_TABLE = "CREATE TABLE " + TODO_TABLE +
             "(" + POSITION + " INTEGER, "
-             + DATE + " TEXT, "
+             + DATE + " INTEGER, "
             + TASK + " TEXT, "
             + DESCR + " TEXT, "
             + STATUS + " INTEGER)";
@@ -64,7 +66,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         db.beginTransaction();
         int maxpos = 0;
         try {
-
             cur = db.query(TODO_TABLE, new String[]{"MAX(position)"}, DATE + " = ?",new String[]{date},null,null,null,null);
             if (cur != null) {
                 if (cur.moveToFirst()) maxpos = cur.getInt(cur.getColumnIndex("MAX(position)"));
@@ -100,8 +101,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
                         TaskModel2 task = new TaskModel2();
 
                         int a = cur.getInt(cur.getColumnIndex(POSITION));
-
-                            Log.d("MYLOG_got_in_list", a+"");
 
                         task.setAll(a,
                                 cur.getInt(cur.getColumnIndex(STATUS)),
@@ -147,7 +146,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public void deleteHelper(String date, int position){
+    private void deleteHelper(String date, int position){
         Map<Integer, Integer> map = new TreeMap<>();
             Cursor cur = null;
             db.beginTransaction();
@@ -173,11 +172,11 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             updatePosition(date, entry.getValue(), entry.getKey());
         }
     }
-    //очистититель базы данных от уже прошедших и не отоюражающихся дней
-    public void Cleartable(){
-
+    //очистититель базы данных от уже прошедших и не отображающихся дней
+    public void clearTable(Calendar c){
+        c.add(Calendar.DATE, -VPadapter.defaultpage);
+        db.delete(TODO_TABLE,DATE + "<?" , new String[]{new SimpleDateFormat("yyMMdd").format(c.getTime())});
     }
-
 
     //ФУНКЦИЯ ТОЛЬКО ДЛЯ ДЕБАГА
     public void deleteAll(){
