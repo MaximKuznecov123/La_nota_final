@@ -3,6 +3,7 @@ package com.example.myapplication.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -28,12 +29,11 @@ public class TaskUpdateCreate extends MyActivity {
     public static final String PositionExtra = "PositionExtra";
 
 
-
     private EditText task, description;
 
     private TasksHandler2 db;
 
-    String date ;
+    String date;
     int position;
 
     Boolean isUpd = false;
@@ -46,7 +46,6 @@ public class TaskUpdateCreate extends MyActivity {
 
         task = findViewById(R.id.Name);
         description = findViewById(R.id.description);
-        Button createTask = findViewById(R.id.taskCreate);
 
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra(BundleExtra);
@@ -57,15 +56,11 @@ public class TaskUpdateCreate extends MyActivity {
 
         if(bundle != null){
             isUpd = true;
-            String tasktext = bundle.getString("task");
-            String descr = bundle.getString("descr");
-            position = i.getIntExtra(PositionExtra, 0);
 
-            task.setText(tasktext);
-            description.setText(descr);
-            createTask.setOnClickListener(view -> onUpdateTask(date, position));
-        }else {
-            createTask.setOnClickListener(view -> onCreateTask(date));
+            task.setText(bundle.getString("task"));
+            description.setText(bundle.getString("descr"));
+
+            position = i.getIntExtra(PositionExtra, 0);
         }
     }
 
@@ -110,7 +105,11 @@ public class TaskUpdateCreate extends MyActivity {
                 db.deleteTask(date, position);
                 finish();
                 break;
-            //будут ещё компоненты
+            case R.id.create:
+                if (isUpd){
+                    onUpdateTask(date, position);
+                }else onCreateTask(date);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
