@@ -57,8 +57,8 @@ public class TaskUpdateCreate extends MyActivity {
         if(bundle != null){
             isUpd = true;
 
-            task.setText(bundle.getString("task"));
-            description.setText(bundle.getString("descr"));
+            task.setText(bundle.getString(BundleTaskName));
+            description.setText(bundle.getString(BundleTaskDescr));
 
             position = i.getIntExtra(PositionExtra, 0);
         }

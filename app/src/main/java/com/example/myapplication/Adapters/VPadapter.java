@@ -12,8 +12,8 @@ import com.example.myapplication.Models.VPfragment;
 
 public class VPadapter extends FragmentStateAdapter {
     private final MainActivity activity;
-    public static final int preFilledPages = 15;
-    public static final int defaultpage = 8;
+    public static final int preFilledPages = 14;
+    public static final int defaultpage = 7;
 
     public VPadapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);

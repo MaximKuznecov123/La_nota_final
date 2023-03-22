@@ -39,15 +39,17 @@ public class MainActivity extends MyActivity {
         viewPager.setAdapter(VPadaptor);
         viewPager.setCurrentItem(VPadapter.defaultpage,false);
 
-
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            c.add(Calendar.DATE, viewPager.getCurrentItem() - VPadapter.defaultpage);
+            int difference = viewPager.getCurrentItem() - VPadapter.defaultpage;
+            c.add(Calendar.DATE, difference);
+
             String date = new SimpleDateFormat("yyMMdd").format(c.getTime());
 
             Intent i = new Intent(this, TaskUpdateCreate.class);
             i.putExtra(TaskUpdateCreate.DateExtra,date);
             startActivity(i);
+            c.add(Calendar.DATE, -difference);
         });
     }
 
@@ -58,13 +60,12 @@ public class MainActivity extends MyActivity {
         if (sh.contains(date)){
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
+            //db.deleteAll();
             if(sh.getString(date,"").equals(today)) {
-                Log.d("MYLOG", "not cleared!");
                 return;
             }
             else {
                 db.clearTable(c);
-                Log.d("MYLOG", "cleared!");
             }
         }
 

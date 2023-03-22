@@ -70,7 +70,6 @@ public class VPfragment extends Fragment {
         curdayTV.setText(curdate);
 
         onResume();
-        //db.deleteAll();
         return rootView;
     }
 

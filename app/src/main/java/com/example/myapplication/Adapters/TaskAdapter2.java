@@ -82,8 +82,8 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
         TaskModel2 item = todolist.get(position);
             Bundle bundle = new Bundle();
 
-            bundle.putString("task", item.getTask());
-            bundle.putString("descr", item.getDescription());
+            bundle.putString(TaskUpdateCreate.BundleTaskName, item.getTask());
+            bundle.putString(TaskUpdateCreate.BundleTaskDescr, item.getDescription());
 
             Intent i = new Intent(activity, TaskUpdateCreate.class);
             i.putExtra(TaskUpdateCreate.BundleExtra, bundle);
