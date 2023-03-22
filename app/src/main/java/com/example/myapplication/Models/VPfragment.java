@@ -64,10 +64,11 @@ public class VPfragment extends Fragment {
         View rootView = inflater.inflate(R.layout.a, container, false);
 
         taskRecyclerList = rootView.findViewById(R.id.ataskRecyclerList);
-        curdayTV = rootView.findViewById(R.id.curday);
         taskRecyclerList.setAdapter(taskAdapter);
+
         curdayTV = rootView.findViewById(R.id.curday);
-        curdayTV.setText(curdate);
+        curdayTV = rootView.findViewById(R.id.curday);
+        curdayTV.setText(MyDateformat(curdate, activity));
 
         onResume();
         return rootView;
@@ -80,5 +81,45 @@ public class VPfragment extends Fragment {
         Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
         taskAdapter.notifyDataSetChanged();
+    }
+
+    public static String MyDateformat(String date, MainActivity activity){
+        String month = date.substring(2, 4);
+        String day = date.substring(4, 6);
+
+        String s = "";
+        switch (month){
+            case "01": s = activity.getResources().getString(R.string.january);
+            break;
+            case "02": s = activity.getResources().getString(R.string.february);
+                break;
+            case "03": s = activity.getResources().getString(R.string.march);
+                break;
+            case "04": s = activity.getResources().getString(R.string.april);
+                break;
+            case "05": s = activity.getResources().getString(R.string.may);
+                break;
+            case "06": s = activity.getResources().getString(R.string.june);
+                break;
+            case "07": s = activity.getResources().getString(R.string.july);
+                break;
+            case "08": s = activity.getResources().getString(R.string.august);
+                break;
+            case "09": s = activity.getResources().getString(R.string.september);
+                break;
+            case "10": s = activity.getResources().getString(R.string.october);
+                break;
+            case "11": s = activity.getResources().getString(R.string.november);
+                break;
+            case "12": s = activity.getResources().getString(R.string.december);
+                break;
+        }
+        if (day.startsWith("0"))
+            s += " " + day.replace("0","");
+        else
+            s += " " + day;
+
+
+        return s;
     }
 }
