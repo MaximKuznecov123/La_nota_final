@@ -6,9 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.icu.util.LocaleData;
 
 import com.example.myapplication.Adapters.VPadapter;
-import com.example.myapplication.Models.TaskModel2;
+import com.example.myapplication.Models.SharedTaskModel;
+import com.example.myapplication.Models.BasicTaskModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
     private static final int VERSION = 1;
     private static final String NAME = "toDoListDatabase";
+
     private static final String TODO_TABLE = "todo";
     private static final String DATE = "date";
     private static final String TASK = "task";
@@ -29,12 +32,24 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     //позиция в списке дня
     private static final String POSITION = "position";
 
-    private static final String CREATE_TODO_TABLE = "CREATE TABLE " + TODO_TABLE +
+    private static final String TODO_SHARED_TABLE = "SHAREDtodo";
+    private static final String FREQUENCY = "frequency";
+    private static final String ID = "id" ;
+
+    private static final String CREATE_TASK_TABLE = "CREATE TABLE " + TODO_TABLE +
             "(" + POSITION + " INTEGER, "
              + DATE + " INTEGER, "
             + TASK + " TEXT, "
             + DESCR + " TEXT, "
             + STATUS + " INTEGER)";
+
+    private static final String CREATE_SHARED_TABLE = "CREATE TABLE " + TODO_SHARED_TABLE +
+            "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + FREQUENCY + " INTEGER,"
+            + DATE + " INTEGER, "
+            + TASK + " TEXT, "
+            + DESCR + " TEXT)";
+
     private SQLiteDatabase db;
 
     public TasksHandler2(Context context){
@@ -43,13 +58,15 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TODO_TABLE);
+        db.execSQL(CREATE_TASK_TABLE);
+        db.execSQL(CREATE_SHARED_TABLE);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
         db.execSQL("DROP TABLE IF EXISTS " + TODO_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TODO_SHARED_TABLE);
         onCreate(db);
     }
 
@@ -60,7 +77,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
-    public void insertTask(TaskModel2 task, String date){
+    public void insertTask(BasicTaskModel task, String date){
         ContentValues cv = new ContentValues();
         Cursor cur = null;
         db.beginTransaction();
@@ -78,7 +95,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
-
         cv.put(DATE, date);
         cv.put(TASK, task.getTask());
         cv.put(DESCR, task.getDescription());
@@ -88,9 +104,21 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         db.insert(TODO_TABLE, null, cv);
     }
 
+    public void insertSHTask(SharedTaskModel task, String date){
+        ContentValues cv = new ContentValues();
+        cv.put(DATE, date);
+        cv.put(FREQUENCY, task.getFrequency());
+        cv.put(TASK, task.getTask());
+        cv.put(DESCR, task.getDescription());
+
+        //Log.d("MYLOGtaskInfo", cv.getAsInteger(DATE) + " " + cv.getAsInteger(FREQUENCY) + '\n' + cv.getAsString(TASK) + " "  + cv.getAsString(DESCR) );
+        db.insert(TODO_SHARED_TABLE, null, cv);
+        //Log.d("MYLOG", "created");
+    }
+
     @SuppressLint("Range")
-    public List<TaskModel2> getAllTasksForDay(String date){
-        List<TaskModel2> taskList = new ArrayList<>();
+    public List<BasicTaskModel> getAllBasicTasksForDay(String date){
+        List<BasicTaskModel> taskList = new ArrayList<>();
         Cursor cur = null;
         db.beginTransaction();
         try {
@@ -98,8 +126,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             if(cur != null){
                 if (cur.moveToFirst()){
                     do {
-                        TaskModel2 task = new TaskModel2();
-
+                        BasicTaskModel task = new BasicTaskModel();
                         int a = cur.getInt(cur.getColumnIndex(POSITION));
 
                         task.setAll(a,
@@ -116,6 +143,30 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             cur.close();
         }
         return taskList;
+    }
+
+    public List<SharedTaskModel> getAllSharedTasksForDay(String date){
+        List<SharedTaskModel> sharedTasklist = new ArrayList<>();
+        Cursor cur = null;
+        db.beginTransaction();
+        try {
+            cur = db.query(TODO_SHARED_TABLE,  null, DATE + " = ?",null,null,null,POSITION,null);
+            if(cur != null){
+                if (cur.moveToFirst()){
+                    do {
+
+                    }while(cur.moveToNext());
+                }
+            }
+        }finally {
+            db.endTransaction();
+            assert cur != null;
+            cur.close();
+        }
+        return sharedTasklist;
+    }
+    public static void a(){
+
     }
     //обновляторы
     public void updateStatus(String date, int position, int status){

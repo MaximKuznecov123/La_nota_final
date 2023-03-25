@@ -1,6 +1,6 @@
 package com.example.myapplication.Models;
 
-public class TaskModel2 {
+public class BasicTaskModel {
     private int position;
 
     private int status;

@@ -1,6 +1,7 @@
 package com.example.myapplication.Models;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ public class VPfragment extends Fragment {
 
 
     private RecyclerView taskRecyclerList;
-      private List<TaskModel2> taskList;
+      private List<BasicTaskModel> taskList;
     private TextView curdayTV;
 
     public VPfragment(int curPage, MainActivity activity) {
@@ -77,7 +78,7 @@ public class VPfragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        taskList = db.getAllTasksForDay(curdate);
+        taskList = db.getAllBasicTasksForDay(curdate);
         Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
         taskAdapter.notifyDataSetChanged();
@@ -119,7 +120,15 @@ public class VPfragment extends Fragment {
         else
             s += " " + day;
 
-
         return s;
+    }
+
+    public TaskAdapter2 getTaskAdapter() {
+        try {
+            return taskAdapter;
+        } catch (Exception e) {
+            Log.d("MYLOG", e.getMessage());
+        }
+        return null;
     }
 }

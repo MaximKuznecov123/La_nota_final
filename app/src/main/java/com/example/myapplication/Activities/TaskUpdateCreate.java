@@ -6,15 +6,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.myapplication.AbstractClasses.MyActivity;
+import com.example.myapplication.Dialogs.EditTaskRepetition;
+import com.example.myapplication.Models.SharedTaskModel;
 import com.example.myapplication.R;
-import com.example.myapplication.Models.TaskModel2;
+import com.example.myapplication.Models.BasicTaskModel;
 import com.example.myapplication.Utils.TasksHandler2;
 
 
@@ -29,7 +32,8 @@ public class TaskUpdateCreate extends MyActivity {
     public static final String PositionExtra = "PositionExtra";
 
 
-    private EditText task, description;
+    private EditText taskED, descriptionED;
+    private TextView repetitionTV;
 
     private TasksHandler2 db;
 
@@ -37,6 +41,7 @@ public class TaskUpdateCreate extends MyActivity {
     int position;
 
     Boolean isUpd = false;
+    int repeType = 0;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -44,8 +49,9 @@ public class TaskUpdateCreate extends MyActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_createtask);
 
-        task = findViewById(R.id.Name);
-        description = findViewById(R.id.description);
+        taskED = findViewById(R.id.Name);
+        descriptionED = findViewById(R.id.description);
+        repetitionTV = findViewById(R.id.task_repetition);
 
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra(BundleExtra);
@@ -57,36 +63,62 @@ public class TaskUpdateCreate extends MyActivity {
         if(bundle != null){
             isUpd = true;
 
-            task.setText(bundle.getString(BundleTaskName));
-            description.setText(bundle.getString(BundleTaskDescr));
+            taskED.setText(bundle.getString(BundleTaskName));
+            descriptionED.setText(bundle.getString(BundleTaskDescr));
 
             position = i.getIntExtra(PositionExtra, 0);
         }
+        EditTaskRepetition repDialog = new EditTaskRepetition(repeType);
+        FragmentManager manager = getSupportFragmentManager();
+
+        repetitionTV.setOnClickListener((view)->{
+            repDialog.show(manager, "dialog");
+        });
     }
 
     private void onCreateTask(String date) {
-        String s = String.valueOf(task.getText());
+        String s = String.valueOf(taskED.getText());
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
         }else{
-            TaskModel2 newtask = new TaskModel2();
-            newtask.setTask(s);
-            newtask.setDescription(String.valueOf(description.getText()));
-            newtask.setStatus(0);
+            if(repeType == 0) {
+                BasicTaskModel newtask = new BasicTaskModel();
+                newtask.setTask(s);
+                newtask.setDescription(String.valueOf(descriptionED.getText()));
+                newtask.setStatus(0);
 
-            db.insertTask(newtask, date);
-            finish();
+                db.insertTask(newtask, date);
+                finish();
+            }else{
+                //Log.d("MYLOG", "repetcreate");
+                SharedTaskModel newtask = new SharedTaskModel();
+                newtask.setAll(repeType, s, String.valueOf(descriptionED.getText()));
+                db.insertSHTask(newtask, date);
+                finish();
+            }
         }
     }
 
     private void onUpdateTask(String date, int position){
-        String s = String.valueOf(task.getText());
+        String s = String.valueOf(taskED.getText());
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
         }else {
             db.updateTask(date, position, s);
-            db.updateDescr(date, position, description.getText() + "");
+            db.updateDescr(date, position, descriptionED.getText() + "");
             finish();
+        }
+    }
+
+    public void onDialogClick(int repeType){
+        this.repeType = repeType;
+        switch (repeType){
+            case 1:
+                repetitionTV.setText("Everyday");
+                break;
+            default:
+                repetitionTV.setText("No repetition");
+                break;
         }
     }
 

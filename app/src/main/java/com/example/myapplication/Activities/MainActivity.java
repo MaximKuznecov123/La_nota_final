@@ -3,6 +3,7 @@ package com.example.myapplication.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import com.example.myapplication.Utils.TasksHandler2;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 
 public class MainActivity extends MyActivity {
@@ -43,7 +45,6 @@ public class MainActivity extends MyActivity {
         fab.setOnClickListener(v -> {
             int difference = viewPager.getCurrentItem() - VPadapter.defaultpage;
             c.add(Calendar.DATE, difference);
-
             String date = new SimpleDateFormat("yyMMdd").format(c.getTime());
 
             Intent i = new Intent(this, TaskUpdateCreate.class);

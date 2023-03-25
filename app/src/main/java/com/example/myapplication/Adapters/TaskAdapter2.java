@@ -14,12 +14,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 
 import com.example.myapplication.Activities.MainActivity;
 import com.example.myapplication.Activities.TaskUpdateCreate;
 import com.example.myapplication.R;
-import com.example.myapplication.Models.TaskModel2;
+import com.example.myapplication.Models.BasicTaskModel;
 import com.example.myapplication.Utils.TasksHandler2;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Random;
 
 public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> {
 
-    private List<TaskModel2> todolist;
+    private List<BasicTaskModel> todolist;
     private static MainActivity activity;
     private final TasksHandler2 db;
     private final String curdate;
@@ -49,7 +50,7 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         db.openDB();
-        TaskModel2 item = todolist.get(position);
+        BasicTaskModel item = todolist.get(position);
         holder.Name.setText(item.getTask());
         holder.Description.setText(item.getDescription());
         holder.task.setChecked(tobool(item.getStatus()));
@@ -73,13 +74,13 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setTasks(List<TaskModel2> todolist){
+    public void setTasks(List<BasicTaskModel> todolist){
         this.todolist = todolist;
         notifyDataSetChanged();
     }
 
     public void editItem(int position){
-        TaskModel2 item = todolist.get(position);
+        BasicTaskModel item = todolist.get(position);
             Bundle bundle = new Bundle();
 
             bundle.putString(TaskUpdateCreate.BundleTaskName, item.getTask());
