@@ -3,8 +3,6 @@ package com.example.myapplication.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.format.Time;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
@@ -16,7 +14,6 @@ import com.example.myapplication.Utils.TasksHandler2;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 
 public class MainActivity extends MyActivity {
@@ -40,7 +37,6 @@ public class MainActivity extends MyActivity {
         //viewPager.registerOnPageChangeCallback(new VPadapter.PageListener());
         viewPager.setAdapter(VPadaptor);
         viewPager.setCurrentItem(VPadapter.defaultpage,false);
-
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             int difference = viewPager.getCurrentItem() - VPadapter.defaultpage;

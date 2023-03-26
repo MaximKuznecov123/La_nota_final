@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.icu.util.LocaleData;
 
 import com.example.myapplication.Adapters.VPadapter;
 import com.example.myapplication.Models.SharedTaskModel;
