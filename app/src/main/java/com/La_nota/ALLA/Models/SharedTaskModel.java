@@ -1,4 +1,4 @@
-package com.example.myapplication.Models;
+package com.La_nota.ALLA.Models;
 
 public class SharedTaskModel {
 

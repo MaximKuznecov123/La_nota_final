@@ -1,10 +1,12 @@
-package com.example.myapplication.Models;
+package com.La_nota.ALLA.Models;
 
 public class BasicTaskModel {
     private int position;
+    private int id;
 
     private int status;
     private String task, description;
+    private boolean shared = false;
 
 
     public void setAll(int position,
@@ -43,4 +45,23 @@ public class BasicTaskModel {
         return position;
     }
 
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setSharedtrue(boolean shared) {
+        this.shared = shared;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

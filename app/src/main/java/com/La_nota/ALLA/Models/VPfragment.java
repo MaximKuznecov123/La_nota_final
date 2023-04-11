@@ -1,7 +1,6 @@
-package com.example.myapplication.Models;
+package com.La_nota.ALLA.Models;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +11,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.Activities.MainActivity;
-import com.example.myapplication.Adapters.TaskAdapter2;
-import com.example.myapplication.Adapters.VPadapter;
-import com.example.myapplication.R;
-import com.example.myapplication.Utils.TasksHandler2;
+import com.La_nota.ALLA.Activities.MainActivity;
+import com.La_nota.ALLA.Adapters.VPadapter;
+import com.La_nota.ALLA.R;
+import com.La_nota.ALLA.Utils.TasksHandler2;
+import com.La_nota.ALLA.Adapters.TaskAdapter2;
 
-import java.text.SimpleDateFormat;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,32 +30,28 @@ public class VPfragment extends Fragment {
 
     private TasksHandler2 db;
     private TaskAdapter2 taskAdapter;
-    private final MainActivity activity;
 
 
     private RecyclerView taskRecyclerList;
       private List<BasicTaskModel> taskList;
     private TextView curdayTV;
 
-    public VPfragment(int curPage, MainActivity activity) {
-        this.page = curPage;
-        this.activity = activity;
-    }
 
+    public VPfragment(int curPage) {
+        this.page = curPage;
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = new TasksHandler2(activity);
+        db = new TasksHandler2(VPadapter.getActivity());
         db.openDB();
         taskList = new ArrayList<>();
 
-        Calendar c = Calendar.getInstance();
         int difference = page - VPadapter.defaultpage;
-        c.add(Calendar.DATE, difference);
+        LocalDate date = LocalDate.now().plusDays(difference);
 
-        curdate = new SimpleDateFormat("yyMMdd").format(c.getTime());
-
-        taskAdapter = new TaskAdapter2(db, activity, curdate);
+        curdate = MainActivity.formatter.format(date);
+        taskAdapter = new TaskAdapter2(db, curdate);
     }
 
     @Nullable
@@ -69,20 +64,24 @@ public class VPfragment extends Fragment {
 
         curdayTV = rootView.findViewById(R.id.curday);
         curdayTV = rootView.findViewById(R.id.curday);
-        curdayTV.setText(MyDateformat(curdate, activity));
+        curdayTV.setText(MyDateformat(curdate, VPadapter.getActivity()));
+        //TODO - fix it
+        if (taskList.isEmpty())onResume();
 
-        onResume();
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        taskList = db.getAllBasicTasksForDay(curdate);
+        taskList = db.getAllTasksForDay(curdate);
         Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
+        MainActivity.Pos = taskAdapter.getItemCount();
         taskAdapter.notifyDataSetChanged();
     }
+
+
 
     public static String MyDateformat(String date, MainActivity activity){
         String month = date.substring(2, 4);
@@ -123,12 +122,4 @@ public class VPfragment extends Fragment {
         return s;
     }
 
-    public TaskAdapter2 getTaskAdapter() {
-        try {
-            return taskAdapter;
-        } catch (Exception e) {
-            Log.d("MYLOG", e.getMessage());
-        }
-        return null;
-    }
 }

@@ -14,7 +14,7 @@
 
         tools:targetApi="31">
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.La_nota.ALLA.Activities.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -28,14 +28,14 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".Activities.TaskUpdateCreate"
+            android:name="com.La_nota.ALLA.Activities.TaskUpdateCreate"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name="com.example.myapplication.AbstractClasses.MyActivity" />
+
     </application>
 
 </manifest>

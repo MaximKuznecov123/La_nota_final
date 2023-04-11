@@ -1,20 +1,26 @@
-package com.example.myapplication.Activities;
+package com.La_nota.ALLA.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.myapplication.AbstractClasses.MyActivity;
-import com.example.myapplication.R;
-import com.example.myapplication.Adapters.VPadapter;
-import com.example.myapplication.Utils.TasksHandler2;
+import com.La_nota.ALLA.AbstractClasses.MyActivity;
+import com.La_nota.ALLA.Adapters.VPadapter;
+import com.La_nota.ALLA.R;
+import com.La_nota.ALLA.Utils.TasksHandler2;
+
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 public class MainActivity extends MyActivity {
     private static final String date = "date";
@@ -23,14 +29,20 @@ public class MainActivity extends MyActivity {
     private static ViewPager2 viewPager;
     private static ExtendedFloatingActionButton fab;
     private static VPadapter VPadaptor;
+    public static int Pos;
+
+    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        Calendar c = Calendar.getInstance();
+
+        LocalDate localDate = LocalDate.now();
         sh = getPreferences(MODE_PRIVATE);
-        tableClearer(c);
+
+        tableClearer(localDate);
+
 
         viewPager = findViewById(R.id.viewPager);
         VPadaptor = new VPadapter(this);
@@ -40,29 +52,34 @@ public class MainActivity extends MyActivity {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             int difference = viewPager.getCurrentItem() - VPadapter.defaultpage;
-            c.add(Calendar.DATE, difference);
-            String date = new SimpleDateFormat("yyMMdd").format(c.getTime());
+
+            LocalDate curPageDate = localDate.plusDays(difference);
+            String date = formatter.format(curPageDate);
 
             Intent i = new Intent(this, TaskUpdateCreate.class);
-            i.putExtra(TaskUpdateCreate.DateExtra,date);
+            i.putExtra(TaskUpdateCreate.DATE_EXTRA, date);
+            i.putExtra(TaskUpdateCreate.POSITION_EXTRA, Pos);
             startActivity(i);
-            c.add(Calendar.DATE, -difference);
         });
     }
 
-    private void tableClearer(Calendar c){
+    private void tableClearer(LocalDate date1){
 
-        String today = new SimpleDateFormat("yyMMdd").format(c.getTime());
+        String today = formatter.format(date1);
 
         if (sh.contains(date)){
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
-            //db.deleteAll();
+
+            //db.deleteBASIC();
+            //db.deleteSH();
+
             if(sh.getString(date,"").equals(today)) {
                 return;
             }
             else {
-                db.clearTable(c);
+                LocalDate dateForClear = date1.plusDays(-VPadapter.defaultpage);
+                db.clearTable(formatter.format(dateForClear));
             }
         }
 
@@ -70,4 +87,5 @@ public class MainActivity extends MyActivity {
         edit.putString(date, today);
         edit.apply();
     }
+
 }

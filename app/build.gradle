@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    namespace 'com.example.myapplication'
+    namespace 'com.La_nota.ALLA'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.myapplication"
-        minSdk 21
+        applicationId "com.La_nota.ALLA"
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"

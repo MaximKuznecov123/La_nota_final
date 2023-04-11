@@ -1,15 +1,14 @@
-package com.example.myapplication.Dialogs;
+package com.La_nota.ALLA.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.myapplication.Activities.TaskUpdateCreate;
+import com.La_nota.ALLA.Activities.TaskUpdateCreate;
 
 public class EditTaskRepetition extends DialogFragment {
 

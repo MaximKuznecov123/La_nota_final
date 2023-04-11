@@ -1,9 +1,10 @@
-package com.example.myapplication.Adapters;
+package com.La_nota.ALLA.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,28 +15,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
+
+import com.La_nota.ALLA.Activities.TaskUpdateCreate;
+import com.La_nota.ALLA.Models.BasicTaskModel;
+import com.La_nota.ALLA.R;
+import com.La_nota.ALLA.Utils.TasksHandler2;
 
 
-import com.example.myapplication.Activities.MainActivity;
-import com.example.myapplication.Activities.TaskUpdateCreate;
-import com.example.myapplication.R;
-import com.example.myapplication.Models.BasicTaskModel;
-import com.example.myapplication.Utils.TasksHandler2;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> {
 
     private List<BasicTaskModel> todolist;
-    private static MainActivity activity;
     private final TasksHandler2 db;
     private final String curdate;
 
-    public TaskAdapter2(TasksHandler2 db, MainActivity activity, String curdate){
+    public TaskAdapter2(TasksHandler2 db, String curdate) {
         this.db = db;
-        this.activity = activity;
         this.curdate = curdate;
     }
 
@@ -43,7 +41,7 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.task_layout,parent,false);
+                .inflate(R.layout.task_layout, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -56,16 +54,21 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
         holder.task.setChecked(tobool(item.getStatus()));
 
         holder.task.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            int transpos = todolist.size() - position;
-            db.updateStatus(curdate, transpos ,isChecked?1:0);
+            if (item.isShared()) {
+                db.updateSharedStatus(curdate, item.getId(), isChecked ? 1 : 0);
+            } else {
+                int transpos = todolist.size() - position;
+                db.updateStatus(curdate, transpos, isChecked ? 1 : 0);
+            }
         });
 
         holder.view.setOnClickListener((v) -> {
             editItem(position);
         });
     }
-    public boolean tobool(int  n){
-        return n!=0;
+
+    public boolean tobool(int n) {
+        return n != 0;
     }
 
     @Override
@@ -74,27 +77,41 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setTasks(List<BasicTaskModel> todolist){
-        this.todolist = todolist;
+    public void setTasks(List<BasicTaskModel> basiclist) {
+        this.todolist = basiclist;
         notifyDataSetChanged();
     }
 
-    public void editItem(int position){
+    public void editItem(int position) {
+        //TODO сделать тоже самое для долённых заданий
         BasicTaskModel item = todolist.get(position);
-            Bundle bundle = new Bundle();
+        Bundle bundle = new Bundle();
 
-            bundle.putString(TaskUpdateCreate.BundleTaskName, item.getTask());
-            bundle.putString(TaskUpdateCreate.BundleTaskDescr, item.getDescription());
+        bundle.putString(TaskUpdateCreate.BUNDLE_TASK_NAME, item.getTask());
+        bundle.putString(TaskUpdateCreate.BUNDLE_TASK_DESCR, item.getDescription());
 
-            Intent i = new Intent(activity, TaskUpdateCreate.class);
-            i.putExtra(TaskUpdateCreate.BundleExtra, bundle);
-            i.putExtra(TaskUpdateCreate.DateExtra, curdate);
-            i.putExtra(TaskUpdateCreate.PositionExtra, item.getPosition());
+        ArrayList<Integer> indexesOfShared = new ArrayList<>();
 
-            activity.startActivity(i);
+        for (BasicTaskModel model :
+                todolist) {
+            if (model.isShared()) {
+                indexesOfShared.add(model.getPosition());
+            }
+        }
+        
+        Log.d("MYLOG", indexesOfShared.toString());
+
+        Intent i = new Intent(VPadapter.getActivity(), TaskUpdateCreate.class);
+        i.putExtra(TaskUpdateCreate.BUNDLE_EXTRA, bundle);
+        i.putExtra(TaskUpdateCreate.DATE_EXTRA, curdate);
+        i.putExtra(TaskUpdateCreate.POSITION_EXTRA, item.getPosition());
+        i.putExtra(TaskUpdateCreate.INDEXES_OF_SHARED_EXTRA, indexesOfShared.toArray());
+
+
+        VPadapter.getActivity().startActivity(i);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         View view;
         CheckBox task;
         TextView Name, Description;
@@ -110,9 +127,10 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
 
             bar = view.findViewById(R.id.color_bar);
             int a = new Random().nextInt(2);
-            Drawable drawable = AppCompatResources.getDrawable(activity,R.drawable.event_list_colorbar);
-            drawable.setTint(activity.getResources().getColor(a == 1 ? R.color.purple_200 : R.color.purple_700));
+            Drawable drawable = AppCompatResources.getDrawable(VPadapter.getActivity(), R.drawable.event_list_colorbar);
+            drawable.setTint(VPadapter.getActivity().getResources().getColor(a == 1 ? R.color.purple_200 : R.color.purple_700));
             bar.setBackground(drawable);
         }
+
     }
 }

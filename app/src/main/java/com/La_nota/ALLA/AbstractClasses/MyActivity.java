@@ -1,4 +1,4 @@
-package com.example.myapplication.AbstractClasses;
+package com.La_nota.ALLA.AbstractClasses;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
