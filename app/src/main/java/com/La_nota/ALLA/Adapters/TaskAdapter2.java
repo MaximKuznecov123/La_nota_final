@@ -55,7 +55,7 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
 
         holder.task.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (item.isShared()) {
-                db.updateSharedStatus(curdate, item.getId(), isChecked ? 1 : 0);
+                db.updateSHStatus(curdate, item.getId(), isChecked ? 1 : 0);
             } else {
                 int transpos = todolist.size() - position;
                 db.updateStatus(curdate, transpos, isChecked ? 1 : 0);
@@ -98,14 +98,15 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
                 indexesOfShared.add(model.getPosition());
             }
         }
-        
-        Log.d("MYLOG", indexesOfShared.toString());
+
+        Log.d("MYLOGindexes", indexesOfShared.toString());
 
         Intent i = new Intent(VPadapter.getActivity(), TaskUpdateCreate.class);
         i.putExtra(TaskUpdateCreate.BUNDLE_EXTRA, bundle);
         i.putExtra(TaskUpdateCreate.DATE_EXTRA, curdate);
         i.putExtra(TaskUpdateCreate.POSITION_EXTRA, item.getPosition());
-        i.putExtra(TaskUpdateCreate.INDEXES_OF_SHARED_EXTRA, indexesOfShared.toArray());
+        i.putExtra(TaskUpdateCreate.INDEXES_OF_SHARED_EXTRA, indexesOfShared);
+        i.putExtra(TaskUpdateCreate.IS_SH, item.isShared());
 
 
         VPadapter.getActivity().startActivity(i);

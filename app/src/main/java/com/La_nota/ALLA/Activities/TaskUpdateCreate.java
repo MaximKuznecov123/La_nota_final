@@ -3,6 +3,7 @@ package com.La_nota.ALLA.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -25,13 +26,15 @@ import java.util.List;
 public class TaskUpdateCreate extends MyActivity {
     //Для получения данных из интента
     public static final String BUNDLE_EXTRA = "BundleExtra";
-        //для получения данных из bundle
-        public static final String BUNDLE_TASK_NAME = "name";
-        public static final String BUNDLE_TASK_DESCR = "descr";
+    //для получения данных из bundle
+    public static final String BUNDLE_TASK_NAME = "name";
+    public static final String BUNDLE_TASK_DESCR = "descr";
 
     public static final String DATE_EXTRA = "DateExtra";
     public static final String POSITION_EXTRA = "PositionExtra";
     public static final String INDEXES_OF_SHARED_EXTRA = "indexesOfshared";
+    public static final String IS_SH = "isShared?";
+    final String[] Array = {"Без повтора", "Каждый день"};
 
 
     private EditText taskED, descriptionED;
@@ -61,10 +64,9 @@ public class TaskUpdateCreate extends MyActivity {
 
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra(BUNDLE_EXTRA);
+
         date = i.getStringExtra(DATE_EXTRA);
         position = i.getIntExtra(POSITION_EXTRA, 0);
-        IndexesOfSH = i.getIntegerArrayListExtra(INDEXES_OF_SHARED_EXTRA);
-
 
         if(bundle != null){
             isUpd = true;
@@ -72,10 +74,13 @@ public class TaskUpdateCreate extends MyActivity {
             taskED.setText(bundle.getString(BUNDLE_TASK_NAME));
             descriptionED.setText(bundle.getString(BUNDLE_TASK_DESCR));
 
-
+            IndexesOfSH = (List<Integer>) i.getSerializableExtra(INDEXES_OF_SHARED_EXTRA);
         }
         EditTaskRepetition repDialog = new EditTaskRepetition(repeType);
         FragmentManager manager = getSupportFragmentManager();
+
+        repetitionTV.setText(Array[i.getBooleanExtra(IS_SH, false)?1 : 0]);
+
 
         repetitionTV.setOnClickListener((view)->{
             repDialog.show(manager, "dialog");
@@ -143,7 +148,7 @@ public class TaskUpdateCreate extends MyActivity {
         switch (item.getItemId()){
             case R.id.delete:
                 //TODO сделать тоже самое для долённых заданий
-                db.deleteTask(date, position);
+                db.deleteTask(date, position, IndexesOfSH);
                 finish();
                 break;
             case R.id.create:

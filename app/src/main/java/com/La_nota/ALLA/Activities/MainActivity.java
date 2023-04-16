@@ -71,9 +71,6 @@ public class MainActivity extends MyActivity {
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
 
-            //db.deleteBASIC();
-            //db.deleteSH();
-
             if(sh.getString(date,"").equals(today)) {
                 return;
             }

@@ -13,6 +13,7 @@ import com.La_nota.ALLA.Activities.TaskUpdateCreate;
 public class EditTaskRepetition extends DialogFragment {
 
     int repeType;
+
     public EditTaskRepetition(int repeType){
         this.repeType = repeType;
     }
@@ -20,7 +21,7 @@ public class EditTaskRepetition extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        final String[] Array = {"No repetition", "Everyday"};
+        final String[] Array = {"Без повтора", "Каждый день"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Repeat")

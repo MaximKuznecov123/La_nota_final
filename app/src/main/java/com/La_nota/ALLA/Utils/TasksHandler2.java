@@ -69,11 +69,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TASK_TABLE);
         db.execSQL(CREATE_SHARED_TABLE);
-        try {
-            db.execSQL(CREATE_SHARED_STATUSES_TABLE);
-        } catch (SQLException e) {
-            Log.d("MYLOGanotherbug", e.getMessage());
-        }
+        db.execSQL(CREATE_SHARED_STATUSES_TABLE);
     }
 
 
@@ -112,7 +108,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
         //Log.d("MYLOGtaskInfo", cv.getAsInteger(DATE) + " " + cv.getAsInteger(FREQUENCY) + '\n' + cv.getAsString(TASK) + " "  + cv.getAsString(DESCR) );
         db.insert(TODO_SHARED_TABLE, null, cv);
-        Log.d("MYLOGinsert", String.valueOf(cv.getAsInteger(DATE)));
         //Log.d("MYLOG", "created");
     }
 
@@ -168,6 +163,9 @@ public class TasksHandler2 extends SQLiteOpenHelper {
                         taskList.addAll(c);
                     }
                 } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        list.get(i).setPosition(i + 1);
+                    }
                     taskList.addAll(list);
                 }
             }
@@ -261,7 +259,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         db.update(TODO_TABLE, cv, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, String.valueOf(position)});
     }
 
-    public void updateSharedStatus(String date, int id, int status) {
+    public void updateSHStatus(String date, int id, int status) {
         db.beginTransaction();
         Cursor cur = null;
         boolean isAlredyAssigned = false;
@@ -285,26 +283,27 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         }
     }
 
-    public void updateTask(int id, String task) {
+    public void updateSHTask(int id, String task) {
         ContentValues cv = new ContentValues();
         cv.put(TASK, task);
         db.update(TODO_SHARED_TABLE, cv, ID + " =?", new String[]{id + ""});
     }
 
-    public void updateDescr(int id, String descr) {
+    public void updateSHDescr(int id, String descr) {
         ContentValues cv = new ContentValues();
         cv.put(DESCR, descr);
         db.update(TODO_SHARED_TABLE, cv, ID + " =?", new String[]{id + ""});
     }
 
 
-    public void deleteTask(String date, int position) {
+    public void deleteTask(String date, int position, List<Integer> indexesOfSH) {
+        if (!indexesOfSH.contains(position))
         db.delete(TODO_TABLE, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, "" + position});
-        deleteHelper(date, position);
+        deleteHelper(date, position, indexesOfSH);
     }
 
     @SuppressLint("Range")
-    private void deleteHelper(String date, int position) {
+    private void deleteHelper(String date, int position, List<Integer> indexesOfSH) {
         // FIXME: не работает с долёнными заданиями
         Map<Integer, Integer> map = new TreeMap<>();
         Cursor cur = null;
@@ -313,13 +312,13 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             cur = db.query(TODO_TABLE, new String[]{POSITION}, DATE + " = ?" + " AND " + POSITION + " > ?", new String[]{date, position + ""}, null, null, POSITION, null);
             if (cur != null) {
                 if (cur.moveToFirst()) {
-                    int neededPos = position;
                     do {
                         int a = cur.getInt(cur.getColumnIndex(POSITION));
-                        map.put(neededPos, a);
-                        neededPos++;
-                    } while (cur.moveToNext());
+                        map.put(a - 1, a);
+                    }
+                    while (cur.moveToNext());
                 }
+
             }
         } finally {
             db.endTransaction();
@@ -344,6 +343,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
     public void deleteSH() {
         db.delete(TODO_SHARED_TABLE, null, null);
+        db.delete(TODO_SHARED_STATUS_TABLE, null, null);
     }
 }
-
