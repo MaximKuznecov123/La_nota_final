@@ -32,19 +32,13 @@ public class TaskUpdateCreate extends MyActivity {
 
     public static final String DATE_EXTRA = "DateExtra";
     public static final String POSITION_EXTRA = "PositionExtra";
-    public static final String INDEXES_OF_SHARED_EXTRA = "indexesOfshared";
-    public static final String IS_SH = "isShared?";
-    final String[] Array = {"Без повтора", "Каждый день"};
-
 
     private EditText taskED, descriptionED;
-    private TextView repetitionTV;
 
     private TasksHandler2 db;
 
     String date;
     int position;
-    List<Integer> IndexesOfSH;
 
     Boolean isUpd = false;
     int repeType = 0;
@@ -57,7 +51,6 @@ public class TaskUpdateCreate extends MyActivity {
 
         taskED = findViewById(R.id.Name);
         descriptionED = findViewById(R.id.description);
-        repetitionTV = findViewById(R.id.task_repetition);
 
         db = new TasksHandler2(this);
         db.openDB();
@@ -74,17 +67,8 @@ public class TaskUpdateCreate extends MyActivity {
             taskED.setText(bundle.getString(BUNDLE_TASK_NAME));
             descriptionED.setText(bundle.getString(BUNDLE_TASK_DESCR));
 
-            IndexesOfSH = (List<Integer>) i.getSerializableExtra(INDEXES_OF_SHARED_EXTRA);
+
         }
-        EditTaskRepetition repDialog = new EditTaskRepetition(repeType);
-        FragmentManager manager = getSupportFragmentManager();
-
-        repetitionTV.setText(Array[i.getBooleanExtra(IS_SH, false)?1 : 0]);
-
-
-        repetitionTV.setOnClickListener((view)->{
-            repDialog.show(manager, "dialog");
-        });
     }
 
     private void onCreateTask(String date, int pos) {
@@ -92,7 +76,6 @@ public class TaskUpdateCreate extends MyActivity {
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
         }else{
-            if(repeType == 0) {
                 BasicTaskModel newtask = new BasicTaskModel();
                 newtask.setTask(s);
                 newtask.setDescription(String.valueOf(descriptionED.getText()));
@@ -100,18 +83,10 @@ public class TaskUpdateCreate extends MyActivity {
 
                 db.insertTask(newtask, date, pos);
                 finish();
-            }else{
-                //Log.d("MYLOG", "repetcreate");
-                SharedTaskModel newtask = new SharedTaskModel();
-                newtask.setAll(repeType, s, String.valueOf(descriptionED.getText()));
-                db.insertSHTask(newtask, date);
-                finish();
-            }
         }
     }
 
     private void onUpdateTask(String date, int position){
-        //TODO тоже самое для долённых заданий
         String s = String.valueOf(taskED.getText());
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
@@ -122,17 +97,6 @@ public class TaskUpdateCreate extends MyActivity {
         }
     }
 
-    public void onDialogClick(int repeType){
-        this.repeType = repeType;
-        switch (repeType){
-            case 1:
-                repetitionTV.setText("Everyday");
-                break;
-            default:
-                repetitionTV.setText("No repetition");
-                break;
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -147,8 +111,7 @@ public class TaskUpdateCreate extends MyActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.delete:
-                //TODO сделать тоже самое для долённых заданий
-                db.deleteTask(date, position, IndexesOfSH);
+                db.deleteTask(date, position);
                 finish();
                 break;
             case R.id.create:

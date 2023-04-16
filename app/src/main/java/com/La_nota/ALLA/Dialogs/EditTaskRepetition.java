@@ -24,13 +24,13 @@ public class EditTaskRepetition extends DialogFragment {
         final String[] Array = {"Без повтора", "Каждый день"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Repeat")
-                .setSingleChoiceItems(Array, repeType,
-                        (dialog, item) -> {
-                    repeType = item;
-                    ((TaskUpdateCreate)getActivity()).onDialogClick(repeType);
-                    dismiss();
-                        });
+//        builder.setTitle("Repeat")
+//                .setSingleChoiceItems(Array, repeType,
+//                        (dialog, item) -> {
+//                    repeType = item;
+//                    ((TaskUpdateCreate)getActivity()).onDialogClick(repeType);
+//                    dismiss();
+//                        });
         return builder.create();
     }
 

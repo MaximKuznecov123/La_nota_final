@@ -54,12 +54,8 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
         holder.task.setChecked(tobool(item.getStatus()));
 
         holder.task.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (item.isShared()) {
-                db.updateSHStatus(curdate, item.getId(), isChecked ? 1 : 0);
-            } else {
-                int transpos = todolist.size() - position;
-                db.updateStatus(curdate, transpos, isChecked ? 1 : 0);
-            }
+            int transpos = todolist.size() - position;
+            db.updateStatus(curdate, transpos ,isChecked?1:0);
         });
 
         holder.view.setOnClickListener((v) -> {
@@ -77,37 +73,23 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setTasks(List<BasicTaskModel> basiclist) {
-        this.todolist = basiclist;
+    public void setTasks(List<BasicTaskModel> todolist){
+        this.todolist = todolist;
         notifyDataSetChanged();
     }
 
     public void editItem(int position) {
-        //TODO сделать тоже самое для долённых заданий
         BasicTaskModel item = todolist.get(position);
         Bundle bundle = new Bundle();
 
         bundle.putString(TaskUpdateCreate.BUNDLE_TASK_NAME, item.getTask());
         bundle.putString(TaskUpdateCreate.BUNDLE_TASK_DESCR, item.getDescription());
 
-        ArrayList<Integer> indexesOfShared = new ArrayList<>();
-
-        for (BasicTaskModel model :
-                todolist) {
-            if (model.isShared()) {
-                indexesOfShared.add(model.getPosition());
-            }
-        }
-
-        Log.d("MYLOGindexes", indexesOfShared.toString());
 
         Intent i = new Intent(VPadapter.getActivity(), TaskUpdateCreate.class);
         i.putExtra(TaskUpdateCreate.BUNDLE_EXTRA, bundle);
         i.putExtra(TaskUpdateCreate.DATE_EXTRA, curdate);
         i.putExtra(TaskUpdateCreate.POSITION_EXTRA, item.getPosition());
-        i.putExtra(TaskUpdateCreate.INDEXES_OF_SHARED_EXTRA, indexesOfShared);
-        i.putExtra(TaskUpdateCreate.IS_SH, item.isShared());
-
 
         VPadapter.getActivity().startActivity(i);
     }
