@@ -1,27 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AbstractClasses.ALLA.Activities.TaskUpdateCreate">
-
-    <ImageView
-        android:id="@+id/task_repetition_image"
-        android:layout_width="52dp"
-        android:layout_height="44dp"
-        android:padding="@dimen/medium_margin"
-        android:src="@drawable/ic_repeat_vector"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/task_repetition"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.53" />
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/button_border">
 
     <EditText
-        android:id="@+id/Name"
-        android:layout_width="wrap_content"
+        android:id="@+id/nametask"
+        android:layout_width="210dp"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="name of task"
@@ -30,40 +16,38 @@
         android:textColorHint="#d9d9d9"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.283"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.121" />
+        app:layout_constraintVertical_bias="0.067"
+        android:backgroundTint="@color/purple_500" />
 
-    <EditText
-        android:id="@+id/description"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/create"
+        android:layout_width="115dp"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="description"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        android:textColorHint="#d9d9d9"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.283"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.287" />
+        android:text="create"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/nametask"
+        app:layout_constraintStart_toEndOf="@+id/delete"
+        app:layout_constraintTop_toBottomOf="@+id/nametask"
+        android:background="@drawable/taskholder"
+        android:backgroundTint="@color/purple_500"/>
 
-    <TextView
-        android:id="@+id/task_repetition"
-        android:layout_width="188dp"
-        android:layout_height="31dp"
-        android:ems="6"
-        android:text="No repetition"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.354"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/description"
-        app:layout_constraintVertical_bias="0.278" />
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="95dp"
+        android:layout_height="wrap_content"
+        android:text="delete"
+        android:textColor="@color/black"
+
+        android:background="@drawable/taskholder"
+        android:backgroundTint="@color/purple_500"
+
+
+
+        app:layout_constraintStart_toStartOf="@+id/nametask"
+        app:layout_constraintTop_toBottomOf="@+id/nametask" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

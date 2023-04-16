@@ -34,21 +34,4 @@ public class VPadapter extends FragmentStateAdapter {
     public static MainActivity getActivity() {
         return activity;
     }
-
-    //Пусть пока лежит - пригодится)))
-//public static class PageListener extends ViewPager2.OnPageChangeCallback {
-//        @Override
-//        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//            super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-//
-//            if (position == 1 ) {
-//                pagesAmount++;
-//                Log.d("MYLOG", pagesAmount + "");
-//            }else if (positionOffset == 0 & position == 0){
-//                pagesAmount--;
-//                Log.d("MYLOG", pagesAmount + "");
-//            }
-//        }
-//    }
-
 }

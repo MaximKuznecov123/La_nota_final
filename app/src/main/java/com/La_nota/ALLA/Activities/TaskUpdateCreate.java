@@ -1,90 +1,86 @@
 package com.La_nota.ALLA.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.La_nota.ALLA.AbstractClasses.MyActivity;
-import com.La_nota.ALLA.Dialogs.EditTaskRepetition;
-import com.La_nota.ALLA.Models.BasicTaskModel;
-import com.La_nota.ALLA.Models.SharedTaskModel;
+import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
 import com.La_nota.ALLA.Utils.TasksHandler2;
 
-import java.util.List;
 
-
-public class TaskUpdateCreate extends MyActivity {
+public class TaskUpdateCreate extends AppCompatActivity {
     //Для получения данных из интента
-    public static final String BUNDLE_EXTRA = "BundleExtra";
-    //для получения данных из bundle
-    public static final String BUNDLE_TASK_NAME = "name";
-    public static final String BUNDLE_TASK_DESCR = "descr";
+    public static final String BUNDLE_EXTRA = "bundle";
+
+    public static final String TASK_NAME_EXTRA = "name";
 
     public static final String DATE_EXTRA = "DateExtra";
     public static final String POSITION_EXTRA = "PositionExtra";
-    public static final String INDEXES_OF_SHARED_EXTRA = "indexesOfshared";
-    public static final String IS_SH = "isShared?";
-    final String[] Array = {"Без повтора", "Каждый день"};
+    public static final String IS_UPD_EXTRA = "isUpd";
 
 
-    private EditText taskED, descriptionED;
-    private TextView repetitionTV;
+    private EditText taskED;
+    private Button deleteBT, createBT;
 
     private TasksHandler2 db;
 
-    String date;
-    int position;
-    List<Integer> IndexesOfSH;
 
-    Boolean isUpd = false;
-    int repeType = 0;
+    private Boolean isUpd;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_createtask);
+        try {
+            setContentView(R.layout.activity_createtask);
+        }catch (Exception e){
+            Log.d("MYLOG", e.getMessage());
+        }
 
-        taskED = findViewById(R.id.Name);
-        descriptionED = findViewById(R.id.description);
-        repetitionTV = findViewById(R.id.task_repetition);
+        setTitle("");
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        taskED = findViewById(R.id.nametask);
+        createBT = findViewById(R.id.create);
+        deleteBT = findViewById(R.id.delete);
+
+        Intent i = getIntent();
+        Bundle data = i.getBundleExtra(BUNDLE_EXTRA);
+
+        String date = data.getString(DATE_EXTRA);
+        int position = data.getInt(POSITION_EXTRA);
+        isUpd = i.getBooleanExtra(IS_UPD_EXTRA, false);
 
         db = new TasksHandler2(this);
         db.openDB();
 
-        Intent i = getIntent();
-        Bundle bundle = i.getBundleExtra(BUNDLE_EXTRA);
+        if (!isUpd) {
+            deleteBT.setVisibility(View.GONE);
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) createBT.getLayoutParams();
+            params.endToEnd = R.id.nametask;
+            params.startToStart = R.id.nametask;
+            params.width = 0;
 
-        date = i.getStringExtra(DATE_EXTRA);
-        position = i.getIntExtra(POSITION_EXTRA, 0);
-
-        if(bundle != null){
-            isUpd = true;
-
-            taskED.setText(bundle.getString(BUNDLE_TASK_NAME));
-            descriptionED.setText(bundle.getString(BUNDLE_TASK_DESCR));
-
-            IndexesOfSH = (List<Integer>) i.getSerializableExtra(INDEXES_OF_SHARED_EXTRA);
+            createBT.setLayoutParams(params);
+            createBT.setOnClickListener(v -> onCreateTask(date, position));
+        } else {
+            createBT.setText("Update");
+            taskED.setText(data.getString(TASK_NAME_EXTRA));
+            createBT.setOnClickListener((v -> onUpdateTask(date, position)));
+            deleteBT.setOnClickListener((v -> onDeleteTask(date, position)));
         }
-        EditTaskRepetition repDialog = new EditTaskRepetition(repeType);
-        FragmentManager manager = getSupportFragmentManager();
-
-        repetitionTV.setText(Array[i.getBooleanExtra(IS_SH, false)?1 : 0]);
-
-
-        repetitionTV.setOnClickListener((view)->{
-            repDialog.show(manager, "dialog");
-        });
     }
 
     private void onCreateTask(String date, int pos) {
@@ -92,70 +88,35 @@ public class TaskUpdateCreate extends MyActivity {
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
         }else{
-            if(repeType == 0) {
-                BasicTaskModel newtask = new BasicTaskModel();
+                TaskModel newtask = new TaskModel();
                 newtask.setTask(s);
-                newtask.setDescription(String.valueOf(descriptionED.getText()));
                 newtask.setStatus(0);
 
                 db.insertTask(newtask, date, pos);
                 finish();
-            }else{
-                //Log.d("MYLOG", "repetcreate");
-                SharedTaskModel newtask = new SharedTaskModel();
-                newtask.setAll(repeType, s, String.valueOf(descriptionED.getText()));
-                db.insertSHTask(newtask, date);
-                finish();
-            }
         }
     }
 
     private void onUpdateTask(String date, int position){
-        //TODO тоже самое для долённых заданий
         String s = String.valueOf(taskED.getText());
         if(s.equals("")){
             Toast.makeText(this, "Заголовок не может быть пустым", Toast.LENGTH_SHORT).show();
         }else {
             db.updateTask(date, position, s);
-            db.updateDescr(date, position, descriptionED.getText() + "");
             finish();
         }
     }
 
-    public void onDialogClick(int repeType){
-        this.repeType = repeType;
-        switch (repeType){
-            case 1:
-                repetitionTV.setText("Everyday");
-                break;
-            default:
-                repetitionTV.setText("No repetition");
-                break;
+    int a = 1;
+    private void onDeleteTask(String date, int position){
+        if(a == 2){
+            db.deleteTask(date, position);
+            finish();
+        }else {
+            a++;
+            Toast.makeText(this, "Repeat to delete", Toast.LENGTH_SHORT).show();
         }
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menutask_upd_create,menu);
-        //кнопка "удалить" появляется только при обновлении задания
-        if(!isUpd) menu.removeItem(R.id.delete);
-        return true;
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.delete:
-                //TODO сделать тоже самое для долённых заданий
-                db.deleteTask(date, position, IndexesOfSH);
-                finish();
-                break;
-            case R.id.create:
-                if (isUpd) onUpdateTask(date, position);
-                else onCreateTask(date, position);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

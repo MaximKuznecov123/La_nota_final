@@ -1,6 +1,7 @@
 package com.La_nota.ALLA.Models;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +34,15 @@ public class VPfragment extends Fragment {
 
 
     private RecyclerView taskRecyclerList;
-      private List<BasicTaskModel> taskList;
+    private List<TaskModel> taskList;
     private TextView curdayTV;
+    boolean isNewTaskcreated = true;
 
 
     public VPfragment(int curPage) {
         this.page = curPage;
     }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,12 +64,13 @@ public class VPfragment extends Fragment {
 
         taskRecyclerList = rootView.findViewById(R.id.ataskRecyclerList);
         taskRecyclerList.setAdapter(taskAdapter);
+        listRefresh();
+        isNewTaskcreated = false;
 
         curdayTV = rootView.findViewById(R.id.curday);
         curdayTV = rootView.findViewById(R.id.curday);
         curdayTV.setText(MyDateformat(curdate, VPadapter.getActivity()));
-        //TODO - fix it
-        if (taskList.isEmpty())onResume();
+
 
         return rootView;
     }
@@ -74,48 +78,67 @@ public class VPfragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (isNewTaskcreated)
+        listRefresh();
+        isNewTaskcreated = true;
+    }
+
+    public void listRefresh(){
         taskList = db.getAllTasksForDay(curdate);
+        Log.d("MYLOG", "norma " + page);
         Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
         MainActivity.Pos = taskAdapter.getItemCount();
+
         taskAdapter.notifyDataSetChanged();
     }
 
 
-
-    public static String MyDateformat(String date, MainActivity activity){
+    public static String MyDateformat(String date, MainActivity activity) {
         String month = date.substring(2, 4);
         String day = date.substring(4, 6);
 
         String s = "";
-        switch (month){
-            case "01": s = activity.getResources().getString(R.string.january);
-            break;
-            case "02": s = activity.getResources().getString(R.string.february);
+        switch (month) {
+            case "01":
+                s = activity.getResources().getString(R.string.january);
                 break;
-            case "03": s = activity.getResources().getString(R.string.march);
+            case "02":
+                s = activity.getResources().getString(R.string.february);
                 break;
-            case "04": s = activity.getResources().getString(R.string.april);
+            case "03":
+                s = activity.getResources().getString(R.string.march);
                 break;
-            case "05": s = activity.getResources().getString(R.string.may);
+            case "04":
+                s = activity.getResources().getString(R.string.april);
                 break;
-            case "06": s = activity.getResources().getString(R.string.june);
+            case "05":
+                s = activity.getResources().getString(R.string.may);
                 break;
-            case "07": s = activity.getResources().getString(R.string.july);
+            case "06":
+                s = activity.getResources().getString(R.string.june);
                 break;
-            case "08": s = activity.getResources().getString(R.string.august);
+            case "07":
+                s = activity.getResources().getString(R.string.july);
                 break;
-            case "09": s = activity.getResources().getString(R.string.september);
+            case "08":
+                s = activity.getResources().getString(R.string.august);
                 break;
-            case "10": s = activity.getResources().getString(R.string.october);
+            case "09":
+                s = activity.getResources().getString(R.string.september);
                 break;
-            case "11": s = activity.getResources().getString(R.string.november);
+            case "10":
+                s = activity.getResources().getString(R.string.october);
                 break;
-            case "12": s = activity.getResources().getString(R.string.december);
+            case "11":
+                s = activity.getResources().getString(R.string.november);
+                break;
+            case "12":
+                s = activity.getResources().getString(R.string.december);
                 break;
         }
         if (day.startsWith("0"))
-            s += " " + day.replace("0","");
+            s += " " + day.replace("0", "");
         else
             s += " " + day;
 

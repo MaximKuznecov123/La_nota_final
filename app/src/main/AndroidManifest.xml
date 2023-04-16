@@ -30,6 +30,7 @@
         <activity
             android:name="com.La_nota.ALLA.Activities.TaskUpdateCreate"
             android:exported="false"
+            android:theme="@style/Theme.AppCompat.Dialog"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
