@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 import com.La_nota.ALLA.Adapters.VPadapter;
-import com.La_nota.ALLA.Dialogs.CreateUpdateTask;
 import com.La_nota.ALLA.R;
 import com.La_nota.ALLA.Utils.TasksHandler2;
 
@@ -46,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         VPadaptor = new VPadapter(this);
         viewPager.setAdapter(VPadaptor);
         viewPager.setCurrentItem(VPadapter.defaultpage, false);
+        viewPager.setOffscreenPageLimit(2);
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             int difference = viewPager.getCurrentItem() - VPadapter.defaultpage;
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         if (sh.contains(date)) {
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
+            db.deleteBASIC();
 
             if (sh.getString(date, "").equals(today)) {
                 return;

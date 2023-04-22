@@ -1,14 +1,11 @@
 package com.La_nota.ALLA.Models;
 
-import java.util.ArrayList;
 
 public class TaskModel {
     private int position;
 
     private int status;
     private String task;
-
-    private ArrayList<SubTaskModel> children;
 
 
     public void setAll(int position,
@@ -38,16 +35,5 @@ public class TaskModel {
         return position;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public void setChildrenList(ArrayList <SubTaskModel> children){
-        this.children = children;
-    }
-
-    public void addNewChild(SubTaskModel child){
-        children.add(child);
-    }
 
 }

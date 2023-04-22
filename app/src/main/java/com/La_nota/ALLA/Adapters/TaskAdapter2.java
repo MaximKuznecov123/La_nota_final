@@ -2,6 +2,8 @@ package com.La_nota.ALLA.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -48,9 +50,20 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
         db.openDB();
         TaskModel item = todolist.get(position);
         holder.Name.setText(item.getTask());
+
+        if (tobool(item.getStatus())) {
+            holder.Name.setPaintFlags(holder.Name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+
         holder.task.setChecked(tobool(item.getStatus()));
 
         holder.task.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                holder.Name.setPaintFlags(holder.Name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            }else {
+                holder.Name.setPaintFlags(holder.Name.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+            }
+
             int transpos = todolist.size() - position;
             db.updateStatus(curdate, transpos ,isChecked?1:0);
         });

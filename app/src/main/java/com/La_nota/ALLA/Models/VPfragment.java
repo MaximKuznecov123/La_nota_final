@@ -60,7 +60,7 @@ public class VPfragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.a, container, false);
+        View rootView = inflater.inflate(R.layout.vpfragment, container, false);
 
         taskRecyclerList = rootView.findViewById(R.id.ataskRecyclerList);
         taskRecyclerList.setAdapter(taskAdapter);
