@@ -6,9 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import com.La_nota.ALLA.Models.SubTaskModel;
 import com.La_nota.ALLA.Models.TaskModel;
 
 import java.util.ArrayList;
@@ -29,18 +26,10 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     private static final String POSITION = "position";
 
     private static final String SUBTASK_TABLE = "subtasks";
-    private static final String POS_OF_ROOT = "root_pos";
 
     private static final String CREATE_TASK_TABLE = "CREATE TABLE " + TASK_TABLE +
             "(" + POSITION + " INTEGER, "
             + DATE + " INTEGER, "
-            + TASK + " TEXT, "
-            + STATUS + " INTEGER)";
-
-    private static final String CREATE_SUBTASK_TABLE = "CREATE TABLE " + SUBTASK_TABLE +
-            "(" + POS_OF_ROOT + " INTEGER, "
-            + DATE + " INTEGER, "
-            + POSITION + " INTEGER, "
             + TASK + " TEXT, "
             + STATUS + " INTEGER)";
 
@@ -54,14 +43,12 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TASK_TABLE);
-        db.execSQL(CREATE_SUBTASK_TABLE);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
         db.execSQL("DROP TABLE IF EXISTS " + TASK_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + SUBTASK_TABLE);
         onCreate(db);
     }
 
@@ -69,7 +56,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         db = this.getWritableDatabase();
     }
 
-    @SuppressLint("Range")
+
     public void insertTask(TaskModel task, String date, int pos) {
         ContentValues cv = new ContentValues();
         cv.put(DATE, date);
@@ -80,17 +67,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         // Log.d("MYLOGoncreate", cv.getAsInteger(POSITION) + " " + cv.getAsString(DATE));
         db.insert(TASK_TABLE, null, cv);
     }
-    
-    public void insertSubTask(SubTaskModel subtask, String date, int rootpos, int pos){
-        ContentValues cv = new ContentValues();
-        cv.put(DATE, date);
-        cv.put(TASK, subtask.getTask());
-        cv.put(STATUS, 0);
-        cv.put(POSITION, pos + 1);
-        cv.put(POS_OF_ROOT, rootpos);
-        
-        db.insert(SUBTASK_TABLE, null, cv);
-    }
+
 
 
     @SuppressLint("Range")
@@ -122,44 +99,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
         }
         return taskList;
     }
-    
-    @SuppressLint("Range")
-    private ArrayList<ArrayList<SubTaskModel>> getAllSubTasks(String date){
-        Map<Integer, ArrayList<SubTaskModel>> MapOfSubtaskLists = new TreeMap<>();
-        Cursor cur = null;
-        db.beginTransaction();
-        try {
-            cur = db.query(SUBTASK_TABLE,  null, DATE + " = ?",new String[]{date},null,null,POSITION,null);
-            if(cur != null){
-                if (cur.moveToFirst()){
-                    do {
-                        int b = cur.getInt(cur.getColumnIndex(POS_OF_ROOT));
 
-                        SubTaskModel subtask = new SubTaskModel();
-                        subtask.setAll(b,
-                                cur.getInt(cur.getColumnIndex(STATUS)),
-                                cur.getString(cur.getColumnIndex(TASK)));
-
-                        if (MapOfSubtaskLists.containsKey(b)){
-                            MapOfSubtaskLists.get(b).add(subtask);
-                        }else{
-                            ArrayList<SubTaskModel> list = new ArrayList<>();
-                            list.add(subtask);
-                            MapOfSubtaskLists.put(b, list);
-                        }
-
-                    }while(cur.moveToNext());
-                }
-            }
-        }finally {
-            db.endTransaction();
-            assert cur != null;
-            cur.close();
-        }
-        Log.d("MYLOG", MapOfSubtaskLists.values().toString());
-
-        return (ArrayList<ArrayList<SubTaskModel>>) MapOfSubtaskLists.values();
-    }
 
     //обновляторы
     public void updateStatus(String date, int position, int status) {
