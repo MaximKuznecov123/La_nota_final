@@ -13,14 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.La_nota.ALLA.Activities.MainActivity;
+import com.La_nota.ALLA.Adapters.TaskAdapter2;
 import com.La_nota.ALLA.Adapters.VPadapter;
 import com.La_nota.ALLA.R;
 import com.La_nota.ALLA.Utils.TasksHandler2;
-import com.La_nota.ALLA.Adapters.TaskAdapter2;
-
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,13 +28,15 @@ public class VPfragment extends Fragment {
     private final int page;
 
     private TasksHandler2 db;
-    private TaskAdapter2 taskAdapter;
+    private TaskAdapter2 basicAdapter;
+    private TaskAdapter2 shAdapter;
 
 
-    private RecyclerView taskRecyclerList;
-    private List<TaskModel> taskList;
+    private RecyclerView basicListRV;
+    private RecyclerView sharedListRV;
+
     private TextView curdayTV;
-    boolean isNewTaskcreated = true;
+    boolean isNewTaskCreated = true;
 
 
     public VPfragment(int curPage) {
@@ -48,13 +48,13 @@ public class VPfragment extends Fragment {
         super.onCreate(savedInstanceState);
         db = new TasksHandler2(VPadapter.getActivity());
         db.openDB();
-        taskList = new ArrayList<>();
 
         int difference = page - VPadapter.defaultpage;
         LocalDate date = LocalDate.now().plusDays(difference);
 
         curdate = MainActivity.formatter.format(date);
-        taskAdapter = new TaskAdapter2(db, curdate);
+        basicAdapter = new TaskAdapter2(db);
+        shAdapter = new TaskAdapter2(db);
     }
 
     @Nullable
@@ -62,15 +62,18 @@ public class VPfragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vpfragment, container, false);
 
-        taskRecyclerList = rootView.findViewById(R.id.ataskRecyclerList);
-        taskRecyclerList.setAdapter(taskAdapter);
-        listRefresh();
-        isNewTaskcreated = false;
+        basicListRV = rootView.findViewById(R.id.ataskRecyclerList);
+        basicListRV.setAdapter(basicAdapter);
+
+        sharedListRV = rootView.findViewById(R.id.taskSHlist);
+        sharedListRV.setAdapter(shAdapter);
+
+        RefreshRVs();
+        isNewTaskCreated = false;
 
         curdayTV = rootView.findViewById(R.id.curday);
         curdayTV = rootView.findViewById(R.id.curday);
         curdayTV.setText(MyDateformat(curdate, VPadapter.getActivity()));
-
 
         return rootView;
     }
@@ -78,19 +81,32 @@ public class VPfragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (isNewTaskcreated)
-        listRefresh();
-        isNewTaskcreated = true;
+        if (isNewTaskCreated)
+            RefreshRVs();
+
+        isNewTaskCreated = true;
     }
 
-    public void listRefresh(){
-        taskList = db.getAllTasksForDay(curdate);
-        Log.d("MYLOG", "norma " + page);
-        Collections.reverse(taskList);
-        taskAdapter.setTasks(taskList);
-        MainActivity.Pos = taskAdapter.getItemCount();
+    public void RefreshRVs() {
+        Thread thread = new Thread(() -> {
+            List<TaskModel> shList = db.getTasks(curdate, true);
+            Collections.reverse(shList);
+            shAdapter.setTasks(shList);
+        });
+        thread.start();
 
-        taskAdapter.notifyDataSetChanged();
+        List<TaskModel> basicList = db.getTasks(curdate, false);
+        Collections.reverse(basicList);
+        basicAdapter.setTasks(basicList);
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Log.e("MYLOG_threadException", e.getMessage() + '\n', e.getCause());
+        }
+
+        basicAdapter.notifyDataSetChanged();
+        shAdapter.notifyDataSetChanged();
     }
 
 

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/button_border">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/layout_border">
 
     <EditText
         android:id="@+id/nametask"
-        android:layout_width="210dp"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="51dp"
+        android:backgroundTint="@color/purple_500"
         android:ems="10"
-        android:hint="name of task"
+        android:hint="name of title"
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:textColorHint="#d9d9d9"
@@ -19,35 +21,77 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.067"
-        android:backgroundTint="@color/purple_500" />
+        app:layout_constraintVertical_bias="0.065" />
+
+    <EditText
+        android:id="@+id/descr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:backgroundTint="@color/purple_500"
+        android:ems="10"
+        android:hint="description of title"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textColorHint="#d9d9d9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/nametask"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/nametask"
+        app:layout_constraintTop_toBottomOf="@+id/nametask"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/create"
-        android:layout_width="115dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/taskholder"
+        android:backgroundTint="@color/purple_500"
         android:text="create"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/nametask"
+        app:layout_constraintEnd_toEndOf="@+id/descr"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/delete"
-        app:layout_constraintTop_toBottomOf="@+id/nametask"
-        android:background="@drawable/taskholder"
-        android:backgroundTint="@color/purple_500"/>
+        app:layout_constraintTop_toBottomOf="@+id/repetitionTV" />
 
     <Button
         android:id="@+id/delete"
-        android:layout_width="95dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="delete"
-        android:textColor="@color/black"
 
         android:background="@drawable/taskholder"
         android:backgroundTint="@color/purple_500"
 
 
+        android:text="delete"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/descr"
+        app:layout_constraintTop_toBottomOf="@+id/repetitionTV" />
 
-        app:layout_constraintStart_toStartOf="@+id/nametask"
-        app:layout_constraintTop_toBottomOf="@+id/nametask" />
+    <TextView
+        android:id="@+id/repetitionTV"
+        android:layout_width="162dp"
+        android:layout_height="39dp"
+        android:drawableLeft="@drawable/ic_repeat_vector"
+        android:ems="10"
+        android:gravity="center"
+        android:text="No repetition"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/descr"
+        app:layout_constraintTop_toBottomOf="@+id/descr" />
+
+    <TextView
+        android:id="@+id/timeTV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="3dp"
+        android:gravity="center"
+        android:text="All day"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/create"
+        app:layout_constraintEnd_toStartOf="@+id/repetitionTV"
+        app:layout_constraintStart_toStartOf="@+id/descr"
+        app:layout_constraintTop_toBottomOf="@+id/descr" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

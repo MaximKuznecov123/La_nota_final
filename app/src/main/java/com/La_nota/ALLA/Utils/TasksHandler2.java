@@ -6,163 +6,252 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.La_nota.ALLA.Activities.MainActivity;
+import com.La_nota.ALLA.Interfaces.TaskOperator;
 import com.La_nota.ALLA.Models.TaskModel;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class TasksHandler2 extends SQLiteOpenHelper {
-
     private static final int VERSION = 1;
-    private static final String NAME = "toDoListDatabase";
 
-    private static final String TASK_TABLE = "tasks";
-    private static final String DATE = "date";
-    private static final String TASK = "task";
-    private static final String STATUS = "status";
-    //позиция в списке дня
-    private static final String POSITION = "position";
+    private static final String DATABASE_NAME = "toDoListDatabase";
 
-    private static final String SUBTASK_TABLE = "subtasks";
+    private static final String TABLE_NAME = "tasks";
+    private static final String DATE_COLUMN = "date";
+    private static final String TITLE_COLUMN = "title";
+    private static final String DESCR_COLUMN = "description";
+    private static final String STATUS_COLUMN = "status";
 
-    private static final String CREATE_TASK_TABLE = "CREATE TABLE " + TASK_TABLE +
-            "(" + POSITION + " INTEGER, "
-            + DATE + " INTEGER, "
-            + TASK + " TEXT, "
-            + STATUS + " INTEGER)";
+    private static final String ID_COLUMN = "id";
 
+    private static final String CREATE_BASIC_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE_COLUMN + " INTEGER, " + TITLE_COLUMN + " TEXT, " + DESCR_COLUMN + " TEXT, " + STATUS_COLUMN + " INTEGER)";
+
+    private static final String SH_TABLE_NAME = "SHAREDtodo";
+    private static final String FREQUENCY_COLUMN = "frequency";
+
+    private static final String CREATE_SHARED_TABLE = "CREATE TABLE " + SH_TABLE_NAME +
+            "(" + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + FREQUENCY_COLUMN + " INTEGER,"
+            + DATE_COLUMN + " INTEGER, "
+            + TITLE_COLUMN + " TEXT, "
+            + DESCR_COLUMN + " TEXT)";
 
     private SQLiteDatabase db;
+    private BasicTaskOperator basicOperator;
+    private SHTaskOperator shOperator;
 
     public TasksHandler2(Context context) {
-        super(context, NAME, null, VERSION);
+        super(context, DATABASE_NAME, null, VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TASK_TABLE);
+        db.execSQL(CREATE_BASIC_TABLE);
+        db.execSQL(CREATE_SHARED_TABLE);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
-        db.execSQL("DROP TABLE IF EXISTS " + TASK_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SH_TABLE_NAME);
         onCreate(db);
     }
 
     public void openDB() {
         db = this.getWritableDatabase();
+        basicOperator = new BasicTaskOperator();
+        shOperator = new SHTaskOperator();
     }
 
-
-    public void insertTask(TaskModel task, String date, int pos) {
-        ContentValues cv = new ContentValues();
-        cv.put(DATE, date);
-        cv.put(TASK, task.getTask());
-        cv.put(STATUS, 0);
-        cv.put(POSITION, pos + 1);
-        // Log.d("MYLOG", cv.getAsInteger(POSITION)+"");
-        // Log.d("MYLOGoncreate", cv.getAsInteger(POSITION) + " " + cv.getAsString(DATE));
-        db.insert(TASK_TABLE, null, cv);
+    public List<TaskModel> getTasks(String date, boolean sh) {
+        return sh ? shOperator.getTasks(date) : basicOperator.getTasks(date);
     }
 
+    public void insertTask(TaskModel task, String date) {
+        if (task.getFrequency() != 0)
+            shOperator.insertTask(task, date);
+        else
+            basicOperator.insertTask(task, date);
+    }
 
+    public void updateStatus(int id, int status, boolean isSH) {
+        if (isSH)
+            shOperator.updateStatus(id, status);
+        else
+            basicOperator.updateStatus(id, status);
+    }
 
-    @SuppressLint("Range")
-    public List<TaskModel> getAllTasksForDay(String date){
-        List<TaskModel> taskList = new ArrayList<>();
-        Cursor cur = null;
-        db.beginTransaction();
-        try {
-            cur = db.query(TASK_TABLE,  null, DATE + " = ?",new String[]{date},null,null,POSITION,null);
-            if(cur != null){
-                if (cur.moveToFirst()){
-                    do {
-                        TaskModel task = new TaskModel();
-                        int position = cur.getInt(cur.getColumnIndex(POSITION));
+    public void updateTask(int id, String title, boolean isSH) {
+        if (isSH)
+            shOperator.updateTitle(id, title);
+        else
+            basicOperator.updateTitle(id, title);
+    }
 
-                        task.setAll(position,
-                                cur.getInt(cur.getColumnIndex(STATUS)),
-                                cur.getString(cur.getColumnIndex(TASK)));
-                        
-                        taskList.add(task);
-                    }while(cur.moveToNext());
+    public void updateDescr(int id, String descr, boolean isSH) {
+        if (isSH)
+            shOperator.updateDescr(id, descr);
+        else
+            basicOperator.updateDescr(id, descr);
+    }
+
+    public void deleteTask(int id, boolean isSH) {
+        if (isSH)
+            shOperator.deleteTask(id);
+        else
+            basicOperator.deleteTask(id);
+    }
+
+    public void clearTable(String dateForClear) {
+        db.delete(TABLE_NAME, DATE_COLUMN + "<?", new String[]{dateForClear});
+    }
+
+    class BasicTaskOperator implements TaskOperator {
+        @SuppressLint("Range")
+        @Override
+        public List<TaskModel> getTasks(String date) {
+            List<TaskModel> taskList = new ArrayList<>();
+            Cursor cur = null;
+            db.beginTransaction();
+            try {
+                cur = db.query(TABLE_NAME, null, DATE_COLUMN + " = ?", new String[]{date}, null, null, null, null);
+                if (cur != null) {
+                    if (cur.moveToFirst()) {
+                        do {
+                            TaskModel task = new TaskModel();
+                            task.setID(cur.getInt(cur.getColumnIndex(ID_COLUMN)));
+                            task.setTitle(cur.getString(cur.getColumnIndex(TITLE_COLUMN)));
+                            task.setDescription(cur.getString(cur.getColumnIndex(DESCR_COLUMN)));
+                            task.setStatus(cur.getInt(cur.getColumnIndex(STATUS_COLUMN)));
+                            taskList.add(task);
+                        } while (cur.moveToNext());
+                    }
                 }
-            }
-        }finally {
-            db.endTransaction();
-            if (cur != null) {
+            } finally {
+                db.endTransaction();
+                assert cur != null;
                 cur.close();
             }
+            return taskList;
         }
-        return taskList;
+
+        @Override
+        public void insertTask(TaskModel task, String date) {
+            ContentValues cv = new ContentValues();
+            cv.put(DATE_COLUMN, date);
+            cv.put(TITLE_COLUMN, task.getTitle());
+            cv.put(DESCR_COLUMN, task.getDescription());
+            cv.put(STATUS_COLUMN, 0);
+            db.insert(TABLE_NAME, null, cv);
+        }
+
+        @Override
+        public void updateStatus(int id, int status) {
+            ContentValues cv = new ContentValues();
+            cv.put(STATUS_COLUMN, status);
+            db.update(TABLE_NAME, cv, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
+        @Override
+        public void updateTitle(int id, String title) {
+            ContentValues cv = new ContentValues();
+            cv.put(TITLE_COLUMN, title);
+            db.update(TABLE_NAME, cv, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
+        @Override
+        public void updateDescr(int id, String descr) {
+            ContentValues cv = new ContentValues();
+            cv.put(DESCR_COLUMN, descr);
+            db.update(TABLE_NAME, cv, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
+        @Override
+        public void deleteTask(int id) {
+            db.delete(TABLE_NAME, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
     }
 
+    class SHTaskOperator implements TaskOperator {
+        @SuppressLint("Range")
+        @Override
+        public List<TaskModel> getTasks(String date) {
+            List<TaskModel> sharedTasklist = new ArrayList<>();
+            Cursor cur = null;
+            db.beginTransaction();
+            try {
+                cur = db.query(SH_TABLE_NAME, null, null, null, null, null, null, null);
+                if (cur != null) {
+                    if (cur.moveToFirst()) {
+                        LocalDate dateForGet = LocalDate.parse(date, MainActivity.formatter);
+                        do {
+                            @SuppressLint("Range") LocalDate dateOfTask = LocalDate.parse(cur.getString(cur.getColumnIndex(DATE_COLUMN)), MainActivity.formatter);
+                            if (!dateForGet.isBefore(dateOfTask)) {
+                                int frequency = cur.getInt(cur.getColumnIndex(FREQUENCY_COLUMN));
+                                if (ChronoUnit.DAYS.between(dateForGet, dateOfTask) % frequency == 0) {
+                                    TaskModel task = new TaskModel();
+                                    task.setFrequency(frequency);
+                                    task.setTitle(cur.getString(cur.getColumnIndex(TITLE_COLUMN)));
+                                    task.setDescription(cur.getString(cur.getColumnIndex(DESCR_COLUMN)));
 
-    //обновляторы
-    public void updateStatus(String date, int position, int status) {
-        ContentValues cv = new ContentValues();
-        cv.put(STATUS, status);
-        db.update(TASK_TABLE, cv, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, String.valueOf(position)});
-    }
+                                    int id = cur.getInt(cur.getColumnIndex(ID_COLUMN));
+                                    task.setID(id);
+                                    //todo статус повтор. задания
+                                    //task.setStatus(getStatusofSharedTask(date, id));
 
-    public void updateTask(String date, int position, String task) {
-        ContentValues cv = new ContentValues();
-        cv.put(TASK, task);
-        db.update(TASK_TABLE, cv, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, String.valueOf(position)});
-    }
-
-    public void updatePosition(String date, int position, int newposition) {
-        ContentValues cv = new ContentValues();
-        cv.put(POSITION, newposition);
-        db.update(TASK_TABLE, cv, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, String.valueOf(position)});
-    }
-
-
-    public void deleteTask(String date, int position) {
-        db.delete(TASK_TABLE, DATE + " =? " + " AND " + POSITION + " =?", new String[]{date, "" + position});
-        deleteHelper(date, position);
-    }
-
-    @SuppressLint("Range")
-    private void deleteHelper(String date, int position){
-        Map<Integer, Integer> map = new TreeMap<>();
-        Cursor cur = null;
-        db.beginTransaction();
-        try {
-            cur = db.query(TASK_TABLE, new String[]{POSITION}, DATE + " = ?" + " AND " + POSITION + " > ?", new String[]{date, position + ""}, null, null, POSITION, null);
-            if (cur != null) {
-                if (cur.moveToFirst()) {
-                    do {
-                        int a = cur.getInt(cur.getColumnIndex(POSITION));
-                        map.put(a - 1, a);
+                                    sharedTasklist.add(task);
+                                }
+                            }
+                        } while (cur.moveToNext());
                     }
-                    while (cur.moveToNext());
                 }
-
+            } finally {
+                db.endTransaction();
+                assert cur != null;
+                cur.close();
             }
-        } finally {
-            db.endTransaction();
-            assert cur != null;
-            cur.close();
+            return sharedTasklist;
         }
-        for (Map.Entry<Integer, Integer> entry :
-                map.entrySet()) {
-            updatePosition(date, entry.getValue(), entry.getKey());
+
+        @Override
+        public void insertTask(TaskModel task, String date) {
+            ContentValues cv = new ContentValues();
+            cv.put(DATE_COLUMN, date);
+            cv.put(TITLE_COLUMN, task.getTitle());
+            cv.put(DESCR_COLUMN, task.getDescription());
+            cv.put(FREQUENCY_COLUMN, task.getFrequency());
+            db.insert(SH_TABLE_NAME, null, cv);
         }
+
+        @Override
+        public void updateStatus(int id, int status) {
+            //todo updateStatus для SH
+        }
+
+        @Override
+        public void updateTitle(int id, String title) {
+            ContentValues cv = new ContentValues();
+            cv.put(TITLE_COLUMN, title);
+            db.update(SH_TABLE_NAME, cv, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
+        @Override
+        public void updateDescr(int id, String descr) {
+            ContentValues cv = new ContentValues();
+            cv.put(DESCR_COLUMN, descr);
+            db.update(SH_TABLE_NAME, cv, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
+        @Override
+        public void deleteTask(int id) {
+            db.delete(SH_TABLE_NAME, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
+        }
+
     }
-
-    //очистититель базы данных от уже прошедших и не отображающихся дней
-    public void clearTable(String dateForClear) {
-        db.delete(TASK_TABLE, DATE + "<?", new String[]{dateForClear});
-    }
-
-    //ФУНКЦИB ТОЛЬКО ДЛЯ ДЕБАГА
-    public void deleteBASIC() {
-        db.delete(TASK_TABLE, null, null);
-    }
-
-
 }

@@ -13,5 +13,15 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+    
+    <style name="Update_Create_activity" parent="@style/Theme.AppCompat.Dialog">
+
+    </style>
+    
+    <style name="MyDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="background">@drawable/taskholder</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+
+    </style>
 
 </resources>
