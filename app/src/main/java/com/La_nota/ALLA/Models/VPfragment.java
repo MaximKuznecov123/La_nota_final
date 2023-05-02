@@ -54,7 +54,7 @@ public class VPfragment extends Fragment {
 
         curdate = MainActivity.formatter.format(date);
         basicAdapter = new TaskAdapter2(db);
-        shAdapter = new TaskAdapter2(db);
+        shAdapter = new TaskAdapter2(db, curdate);
     }
 
     @Nullable

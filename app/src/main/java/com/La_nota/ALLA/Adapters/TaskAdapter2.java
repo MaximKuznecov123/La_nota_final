@@ -25,7 +25,12 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
 
     private List<TaskModel> todolist;
     private final TasksHandler2 db;
+    private String date;
 
+    public TaskAdapter2(TasksHandler2 db, String date) {
+        this.db = db;
+        this.date = date;
+    }
     public TaskAdapter2(TasksHandler2 db) {
         this.db = db;
     }
@@ -61,7 +66,7 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
                 holder.description.setPaintFlags(holder.name.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
-            db.updateStatus(item.getID(), isChecked?1:0, item.getFrequency() == 0);
+            db.updateStatus(date, item.getID(), isChecked?1:0);
         });
 
         holder.view.setOnClickListener((v) -> {

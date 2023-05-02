@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.La_nota.ALLA.Activities.MainActivity;
 import com.La_nota.ALLA.Interfaces.TaskOperator;
@@ -17,11 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TasksHandler2 extends SQLiteOpenHelper {
-    private static final int VERSION = 1;
+    public static final int VERSION = 1;
 
     private static final String DATABASE_NAME = "toDoListDatabase";
 
     private static final String TABLE_NAME = "tasks";
+    private static final String SH_TABLE_NAME = "SHAREDtodo";
+    private static final String SH_STATUS_TABLE_NAME = "statusSHAREDtodo";
+
     private static final String DATE_COLUMN = "date";
     private static final String TITLE_COLUMN = "title";
     private static final String DESCR_COLUMN = "description";
@@ -29,9 +33,13 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
     private static final String ID_COLUMN = "id";
 
-    private static final String CREATE_BASIC_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE_COLUMN + " INTEGER, " + TITLE_COLUMN + " TEXT, " + DESCR_COLUMN + " TEXT, " + STATUS_COLUMN + " INTEGER)";
+    private static final String CREATE_BASIC_TABLE = "CREATE TABLE " + TABLE_NAME +
+            "(" + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + DATE_COLUMN + " INTEGER, "
+            + TITLE_COLUMN + " TEXT, "
+            + DESCR_COLUMN + " TEXT, "
+            + STATUS_COLUMN + " INTEGER)";
 
-    private static final String SH_TABLE_NAME = "SHAREDtodo";
     private static final String FREQUENCY_COLUMN = "frequency";
 
     private static final String CREATE_SHARED_TABLE = "CREATE TABLE " + SH_TABLE_NAME +
@@ -40,6 +48,10 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             + DATE_COLUMN + " INTEGER, "
             + TITLE_COLUMN + " TEXT, "
             + DESCR_COLUMN + " TEXT)";
+
+    private static final String CREATE_SHARED_STATUSES_TABLE = "CREATE TABLE " + SH_STATUS_TABLE_NAME +
+            "(" + DATE_COLUMN + " INTEGER, "
+            + ID_COLUMN + " INTEGER)";
 
     private SQLiteDatabase db;
     private BasicTaskOperator basicOperator;
@@ -53,6 +65,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_BASIC_TABLE);
         db.execSQL(CREATE_SHARED_TABLE);
+        db.execSQL(CREATE_SHARED_STATUSES_TABLE);
     }
 
 
@@ -60,6 +73,7 @@ public class TasksHandler2 extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + SH_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SH_STATUS_TABLE_NAME);
         onCreate(db);
     }
 
@@ -80,9 +94,9 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             basicOperator.insertTask(task, date);
     }
 
-    public void updateStatus(int id, int status, boolean isSH) {
-        if (isSH)
-            shOperator.updateStatus(id, status);
+    public void updateStatus(String date, int id, int status) {
+        if (date != null)
+            shOperator.updateStatus(date, id, status);
         else
             basicOperator.updateStatus(id, status);
     }
@@ -151,7 +165,6 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             db.insert(TABLE_NAME, null, cv);
         }
 
-        @Override
         public void updateStatus(int id, int status) {
             ContentValues cv = new ContentValues();
             cv.put(STATUS_COLUMN, status);
@@ -186,27 +199,24 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             Cursor cur = null;
             db.beginTransaction();
             try {
-                cur = db.query(SH_TABLE_NAME, null, null, null, null, null, null, null);
+                cur = db.query(SH_TABLE_NAME, null, DATE_COLUMN + " <= " + date, null, null, null, null, null);
                 if (cur != null) {
                     if (cur.moveToFirst()) {
                         LocalDate dateForGet = LocalDate.parse(date, MainActivity.formatter);
                         do {
                             @SuppressLint("Range") LocalDate dateOfTask = LocalDate.parse(cur.getString(cur.getColumnIndex(DATE_COLUMN)), MainActivity.formatter);
-                            if (!dateForGet.isBefore(dateOfTask)) {
-                                int frequency = cur.getInt(cur.getColumnIndex(FREQUENCY_COLUMN));
-                                if (ChronoUnit.DAYS.between(dateForGet, dateOfTask) % frequency == 0) {
-                                    TaskModel task = new TaskModel();
-                                    task.setFrequency(frequency);
-                                    task.setTitle(cur.getString(cur.getColumnIndex(TITLE_COLUMN)));
-                                    task.setDescription(cur.getString(cur.getColumnIndex(DESCR_COLUMN)));
+                            int frequency = cur.getInt(cur.getColumnIndex(FREQUENCY_COLUMN));
+                            if (ChronoUnit.DAYS.between(dateForGet, dateOfTask) % frequency == 0) {
+                                TaskModel task = new TaskModel();
+                                task.setFrequency(frequency);
+                                task.setTitle(cur.getString(cur.getColumnIndex(TITLE_COLUMN)));
+                                task.setDescription(cur.getString(cur.getColumnIndex(DESCR_COLUMN)));
 
-                                    int id = cur.getInt(cur.getColumnIndex(ID_COLUMN));
-                                    task.setID(id);
-                                    //todo статус повтор. задания
-                                    //task.setStatus(getStatusofSharedTask(date, id));
+                                int id = cur.getInt(cur.getColumnIndex(ID_COLUMN));
+                                task.setID(id);
+                                task.setStatus(getStatusOfSharedTask(date, id));
 
-                                    sharedTasklist.add(task);
-                                }
+                                sharedTasklist.add(task);
                             }
                         } while (cur.moveToNext());
                     }
@@ -217,6 +227,25 @@ public class TasksHandler2 extends SQLiteOpenHelper {
                 cur.close();
             }
             return sharedTasklist;
+        }
+        
+        @SuppressLint("Range")
+        public int getStatusOfSharedTask(String date, int id) {
+            Cursor cur = null;
+            db.beginTransaction();
+            int result = 0;
+            try {
+                cur = db.query(SH_STATUS_TABLE_NAME, null, DATE_COLUMN + " =? " + " AND " + ID_COLUMN + " =?", new String[]{date, id + ""}, null, null, null);
+                if (cur != null) {
+                    if (cur.moveToFirst())
+                        result = 1;
+                }
+            } finally {
+                db.endTransaction();
+                assert cur != null;
+                cur.close();
+            }
+            return result;
         }
 
         @Override
@@ -229,9 +258,15 @@ public class TasksHandler2 extends SQLiteOpenHelper {
             db.insert(SH_TABLE_NAME, null, cv);
         }
 
-        @Override
-        public void updateStatus(int id, int status) {
-            //todo updateStatus для SH
+        public void updateStatus(String date, int id, int status) {
+            if (status == 0)
+                db.delete(SH_STATUS_TABLE_NAME, ID_COLUMN + " =? " + " AND " + DATE_COLUMN + " =?", new String[]{String.valueOf(id), date});
+            else {
+                ContentValues cv = new ContentValues();
+                cv.put(ID_COLUMN, id);
+                cv.put(DATE_COLUMN, date);
+                db.insert(SH_STATUS_TABLE_NAME, null, cv);
+            }
         }
 
         @Override
@@ -250,8 +285,15 @@ public class TasksHandler2 extends SQLiteOpenHelper {
 
         @Override
         public void deleteTask(int id) {
+            db.delete(SH_STATUS_TABLE_NAME, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
             db.delete(SH_TABLE_NAME, ID_COLUMN + " =?", new String[]{String.valueOf(id)});
         }
 
     }
+    public void deleteAll(){
+        db.delete(SH_STATUS_TABLE_NAME, null,null);
+        db.delete(TABLE_NAME, null, null);
+        db.delete(SH_TABLE_NAME, null, null);
+    }
+
 }

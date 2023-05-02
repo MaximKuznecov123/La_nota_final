@@ -2,33 +2,20 @@ package com.La_nota.ALLA.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.La_nota.ALLA.Activities.TaskUpdateCreate;
 import com.La_nota.ALLA.R;
 
 public class EditTaskFrequency extends DialogFragment {
-
     int repeType;
 
     public EditTaskFrequency(int repeType){
         this.repeType = repeType;
     }
-
 
     @NonNull
     @Override
@@ -48,6 +35,4 @@ public class EditTaskFrequency extends DialogFragment {
 
         return dialog;
     }
-
-
 }

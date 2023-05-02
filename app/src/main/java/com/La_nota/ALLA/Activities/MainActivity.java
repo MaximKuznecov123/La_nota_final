@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private ExtendedFloatingActionButton fab;
     private VPadapter VPadaptor;
+    private int VPposition = 7;
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
 
@@ -45,10 +47,21 @@ public class MainActivity extends AppCompatActivity {
 
 
         viewPager = findViewById(R.id.viewPager);
-        VPadaptor = new VPadapter(this);
+        VPadaptor = new VPadapter(this,  viewPager);
         viewPager.setAdapter(VPadaptor);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                if (position != VPposition ) {
+                    Log.d("MYLOG", String.valueOf(position));
+                    VPadaptor.fragments[position].RefreshRVs();
+                }
+            }
+        });
+
         viewPager.setCurrentItem(VPadapter.defaultpage, false);
-        viewPager.setOffscreenPageLimit(1);
+        viewPager.setOffscreenPageLimit(VPadapter.preFilledPages);
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -72,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
         if (sh.contains(date)) {
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
-            //db.deleteBASIC();
-
+            //todo удалить потом
+            db.deleteAll();
             if (sh.getString(date, "").equals(today)) {
                 return;
             } else {

@@ -9,7 +9,6 @@ public interface TaskOperator {
     List<TaskModel> getTasks(String date);
 
     void insertTask(TaskModel task, String date);
-    void updateStatus(int id, int status);
     void updateTitle(int id, String title);
     void updateDescr(int id, String descr);
 

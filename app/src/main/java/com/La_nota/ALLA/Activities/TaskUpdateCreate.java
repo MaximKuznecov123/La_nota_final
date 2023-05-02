@@ -115,7 +115,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
             Toast.makeText(this, "Label can't be empty", Toast.LENGTH_SHORT).show();
         }else {
             db.updateTask(id, s, repeType != 0);
-            db.updateDescr(id, String.valueOf(descrED.getText()), repeType == 0);
+            db.updateDescr(id, String.valueOf(descrED.getText()), repeType != 0);
             finish();
         }
     }
