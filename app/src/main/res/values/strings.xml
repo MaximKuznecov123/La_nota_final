@@ -14,4 +14,21 @@
     <string name="october">October</string>
     <string name="november">November</string>
     <string name="december">December</string>
+    <string name="no_repetition">No repetition</string>
+    <string name="title">title</string>
+    <string name="description">description</string>
+    <string name="create">Create</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="cant_be_empty">" can't be emty"</string>
+    <string name="repeat_to_delete">Repeat to delete</string>
+    <string name="everyday">Everyday</string>
+    <string name="every_week">Every week</string>
+    <string name="choose_own">Choose Own</string>
+    <string name="repeat">Repeat</string>
+    <string name="own_repeat">Repeat once in ... days</string>
+    <string name="once_in_days">"once in "</string>
+    <string name="dnia">" days"</string>
+    <string name="dnei">" days"</string>
+    <string name="field">This field</string>
 </resources>

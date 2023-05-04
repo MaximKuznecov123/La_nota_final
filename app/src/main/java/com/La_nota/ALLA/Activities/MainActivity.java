@@ -3,19 +3,15 @@ package com.La_nota.ALLA.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
-import com.La_nota.ALLA.Adapters.VPadapter;
-import com.La_nota.ALLA.Dialogs.EditTaskFrequency;
-import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Utils.TasksHandler2;
 
+import com.La_nota.ALLA.Adapters.VPadapter;
+import com.La_nota.ALLA.R;
+import com.La_nota.ALLA.Database.TasksHandler2;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.time.LocalDate;
@@ -29,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private ExtendedFloatingActionButton fab;
     private VPadapter VPadaptor;
-    private int VPposition = 7;
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
 
@@ -47,19 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         viewPager = findViewById(R.id.viewPager);
-        VPadaptor = new VPadapter(this,  viewPager);
+        VPadaptor = new VPadapter(this);
         viewPager.setAdapter(VPadaptor);
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-                if (position != VPposition ) {
-                    Log.d("MYLOG", String.valueOf(position));
-                    VPadaptor.fragments[position].RefreshRVs();
-                }
-            }
-        });
-
         viewPager.setCurrentItem(VPadapter.defaultpage, false);
         viewPager.setOffscreenPageLimit(VPadapter.preFilledPages);
 

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.La_nota.ALLA.Activities.TaskUpdateCreate;
 import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Utils.TasksHandler2;
+import com.La_nota.ALLA.Database.TasksHandler2;
 
 import java.util.List;
 import java.util.Random;

@@ -13,4 +13,21 @@
     <string name="october">Октябрь</string>
     <string name="november">Ноябрь</string>
     <string name="december">Декабрь</string>
+    <string name="no_repetition">Без повторения</string>
+    <string name="title">название</string>
+    <string name="description">описание</string>
+    <string name="create">Создать</string>
+    <string name="delete">Удалить</string>
+    <string name="update">Обновить</string>
+    <string name="cant_be_empty">" не может быть пустым"</string>
+    <string name="repeat_to_delete">Повторите для удаления</string>
+    <string name="everyday">Каждый день</string>
+    <string name="every_week">Каждую неделю</string>
+    <string name="choose_own">Выбрать своё</string>
+    <string name="repeat">Повторять</string>
+    <string name="own_repeat">Повторять раз в ... дней</string>
+    <string name="once_in_days">"раз в "</string>
+    <string name="dnia">" дня"</string>
+    <string name="dnei">" дней"</string>
+    <string name="field">Это поле</string>
 </resources>

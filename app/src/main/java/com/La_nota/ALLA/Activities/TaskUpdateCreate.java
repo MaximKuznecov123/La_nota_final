@@ -18,7 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import com.La_nota.ALLA.Dialogs.EditTaskFrequency;
 import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Utils.TasksHandler2;
+import com.La_nota.ALLA.Database.TasksHandler2;
 
 
 public class TaskUpdateCreate extends AppCompatActivity {
@@ -32,13 +32,13 @@ public class TaskUpdateCreate extends AppCompatActivity {
     public static final String ID_EXTRA = "IDExtra";
     public static final String FREQUENCY_EXTRA = "FrExtra";
 
-    public static final String[] repArray = {"No repetition", "Every day", "Every week"};
+    public static String[] repArray;
 
     private EditText titleED, descrED;
     private Button deleteBT, createBT;
     private TextView repetitionTV;
 
-    int repeType = 0;
+    int frequency = 0;
 
     private TasksHandler2 db;
 
@@ -50,6 +50,8 @@ public class TaskUpdateCreate extends AppCompatActivity {
         setContentView(R.layout.activity_createtask);
         setTitle("");
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        repArray = new String[]{getResources().getString(R.string.no_repetition), getResources().getString(R.string.everyday), getResources().getString(R.string.every_week), getResources().getString(R.string.choose_own), null};
 
         titleED = findViewById(R.id.nametask);
         descrED = findViewById(R.id.descr);
@@ -74,66 +76,81 @@ public class TaskUpdateCreate extends AppCompatActivity {
             String date = i.getStringExtra(DATE_EXTRA);
             createBT.setOnClickListener(v -> onCreateTask(date));
         } else {
-            createBT.setText("Update");
+            createBT.setText(R.string.update);
             titleED.setText(data.getString(TASK_TITLE_EXTRA));
             descrED.setText(data.getString(TASK_DESCR_EXTRA));
-            repeType = data.getInt(FREQUENCY_EXTRA, 0);
+            frequency = data.getInt(FREQUENCY_EXTRA, 0);
 
             int id = data.getInt(ID_EXTRA);
             createBT.setOnClickListener((v -> onUpdateTask(id)));
             deleteBT.setOnClickListener((v -> onDeleteTask(id)));
         }
 
-        EditTaskFrequency repDialog = new EditTaskFrequency(repeType);
+        EditTaskFrequency repDialog = new EditTaskFrequency(frequency);
         FragmentManager manager = getSupportFragmentManager();
-        repetitionTV.setText(repArray[repeType]);
+        repetitionTV.setText(repArray[frequency]);
 
-        repetitionTV.setOnClickListener((view)->{
+        repetitionTV.setOnClickListener((view) -> {
             repDialog.show(manager, "dialog");
         });
     }
 
     private void onCreateTask(String date) {
         String s = String.valueOf(titleED.getText());
-        if(s.equals("")){
-            Toast.makeText(this, "Label can't be empty", Toast.LENGTH_SHORT).show();
-        }else{
-                TaskModel newtask = new TaskModel();
-                newtask.setTitle(s);
-                newtask.setDescription(String.valueOf(descrED.getText()));
-                newtask.setStatus(0);
-                newtask.setFrequency(repeType);
+        if (s.equals("")) {
+            Toast.makeText(this, R.string.title + R.string.cant_be_empty, Toast.LENGTH_SHORT).show();
+        } else {
+            TaskModel newtask = new TaskModel();
+            newtask.setTitle(s);
+            newtask.setDescription(String.valueOf(descrED.getText()));
+            newtask.setStatus(0);
+            newtask.setFrequency(frequency);
 
-                db.insertTask(newtask, date);
-                finish();
+            db.insertTask(newtask, date);
+            finish();
         }
     }
 
-    private void onUpdateTask(int id){
+    private void onUpdateTask(int id) {
         String s = String.valueOf(titleED.getText());
-        if(s.equals("")){
-            Toast.makeText(this, "Label can't be empty", Toast.LENGTH_SHORT).show();
-        }else {
-            db.updateTask(id, s, repeType != 0);
-            db.updateDescr(id, String.valueOf(descrED.getText()), repeType != 0);
+        if (s.equals("")) {
+            Toast.makeText(this,R.string.title + R.string.cant_be_empty, Toast.LENGTH_SHORT).show();
+        } else {
+            db.updateTask(id, s, frequency != 0);
+            db.updateDescr(id, String.valueOf(descrED.getText()), frequency != 0);
             finish();
         }
     }
 
     int toDeleteCount = 1;
-    private void onDeleteTask(int id){
-        if(toDeleteCount == 2){
-            db.deleteTask(id, repeType != 0);
+
+    private void onDeleteTask(int id) {
+        if (toDeleteCount == 2) {
+            db.deleteTask(id, frequency != 0);
             finish();
-        }else {
+        } else {
             toDeleteCount++;
-            Toast.makeText(this, "Repeat to delete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.repeat_to_delete, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void onDialogClick(int repetype){
-        this.repeType = repetype;
-        repetitionTV.setText(repArray[repetype]);
+    public void onDialogClick(int frequency) {
+        this.frequency = frequency;
+        switch (frequency){
+            case 0:
+            case 1:
+                repetitionTV.setText(repArray[frequency]);
+                repArray[4] = null;
+                break;
+            case 7:
+                repetitionTV.setText(repArray[2]);
+                repArray[4] = null;
+                break;
+            default:
+                repArray[4] = getResources().getString(R.string.once_in_days) + frequency + getResources().getString(frequency > 4? R.string.dnei : R.string.dnia);
+                repetitionTV.setText(repArray[4]);
+                break;
+        }
     }
 
 }

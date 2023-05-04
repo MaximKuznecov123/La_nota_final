@@ -8,11 +8,11 @@
 
     <EditText
         android:id="@+id/nametask"
-        android:layout_width="250dp"
-        android:layout_height="51dp"
+        android:layout_width="321dp"
+        android:layout_height="55dp"
         android:backgroundTint="@color/purple_500"
         android:ems="10"
-        android:hint="name of title"
+        android:hint="@string/title"
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:textColorHint="#d9d9d9"
@@ -30,7 +30,7 @@
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/purple_500"
         android:ems="10"
-        android:hint="description of title"
+        android:hint="@string/description"
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:textColorHint="#d9d9d9"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/taskholder"
         android:backgroundTint="@color/purple_500"
-        android:text="create"
+        android:text="@string/create"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/descr"
         app:layout_constraintHorizontal_bias="0.0"
@@ -63,33 +63,33 @@
         android:backgroundTint="@color/purple_500"
 
 
-        android:text="delete"
+        android:text="@string/delete"
         android:textColor="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/repetitionTV"
         app:layout_constraintStart_toStartOf="@+id/descr"
         app:layout_constraintTop_toBottomOf="@+id/repetitionTV" />
 
     <TextView
         android:id="@+id/repetitionTV"
-        android:layout_width="162dp"
-        android:layout_height="39dp"
-        android:drawableLeft="@drawable/ic_repeat_vector"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
         android:ems="10"
         android:gravity="center"
-        android:text="No repetition"
+        android:text="@string/no_repetition"
         android:textSize="20sp"
+        app:drawableStartCompat="@drawable/ic_repeat_vector"
         app:layout_constraintEnd_toEndOf="@+id/descr"
+        app:layout_constraintStart_toEndOf="@+id/timeTV"
         app:layout_constraintTop_toBottomOf="@+id/descr" />
 
     <TextView
         android:id="@+id/timeTV"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="3dp"
+        android:layout_width="115dp"
+        android:layout_height="40dp"
         android:gravity="center"
         android:text="All day"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/create"
-        app:layout_constraintEnd_toStartOf="@+id/repetitionTV"
         app:layout_constraintStart_toStartOf="@+id/descr"
         app:layout_constraintTop_toBottomOf="@+id/descr" />
 

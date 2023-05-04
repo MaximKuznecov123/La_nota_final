@@ -1,7 +1,6 @@
 package com.La_nota.ALLA.Models;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,7 @@ import com.La_nota.ALLA.Activities.MainActivity;
 import com.La_nota.ALLA.Adapters.TaskAdapter2;
 import com.La_nota.ALLA.Adapters.VPadapter;
 import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Utils.TasksHandler2;
+import com.La_nota.ALLA.Database.TasksHandler2;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -24,13 +23,14 @@ import java.util.List;
 
 
 public class VPfragment extends Fragment {
+    private final VPadapter vPadapter;
     private String curdate;
     private final int page;
 
     private TasksHandler2 db;
     private TaskAdapter2 basicAdapter;
     private TaskAdapter2 shAdapter;
-
+    private int latestShItemCount = 0;
 
     private RecyclerView basicListRV;
     private RecyclerView sharedListRV;
@@ -39,8 +39,9 @@ public class VPfragment extends Fragment {
     boolean isNewTaskCreated = true;
 
 
-    public VPfragment(int curPage) {
+    public VPfragment(int curPage, VPadapter vPadapter) {
         this.page = curPage;
+        this.vPadapter = vPadapter;
     }
 
     @Override
@@ -68,7 +69,8 @@ public class VPfragment extends Fragment {
         sharedListRV = rootView.findViewById(R.id.taskSHlist);
         sharedListRV.setAdapter(shAdapter);
 
-        RefreshRVs();
+        refreshRV();
+        refreshSHRV();
         isNewTaskCreated = false;
 
         curdayTV = rootView.findViewById(R.id.curday);
@@ -81,32 +83,28 @@ public class VPfragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (isNewTaskCreated)
-            RefreshRVs();
+        if (isNewTaskCreated) {
+            refreshRV();
+            refreshSHRV();
+            if (shAdapter.getItemCount() != latestShItemCount) {
+                vPadapter.refreshSHRVs();
+                latestShItemCount = shAdapter.getItemCount();
+            }
+        }
 
         isNewTaskCreated = true;
     }
 
-    public void RefreshRVs() {
-        Thread thread = new Thread(() -> {
-            List<TaskModel> shList = db.getTasks(curdate, true);
-            Collections.reverse(shList);
-            shAdapter.setTasks(shList);
-        });
-        thread.start();
-
+    public void refreshRV() {
         List<TaskModel> basicList = db.getTasks(curdate, false);
         Collections.reverse(basicList);
         basicAdapter.setTasks(basicList);
+    }
 
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Log.e("MYLOG_threadException", e.getMessage() + '\n', e.getCause());
-        }
-
-        basicAdapter.notifyDataSetChanged();
-        shAdapter.notifyDataSetChanged();
+    public void refreshSHRV() {
+        List<TaskModel> shList = db.getTasks(curdate, true);
+        Collections.reverse(shList);
+        shAdapter.setTasks(shList);
     }
 
 

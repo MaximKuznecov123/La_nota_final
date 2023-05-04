@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_border">
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="247dp"
+        android:layout_height="28dp"
+        android:text="@string/own_repeat"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.126" />
+
+    <EditText
+        android:id="@+id/dialog_custom_repeat_interval_value"
+        android:backgroundTint="@color/purple_500"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:digits="0123456789"
+        android:inputType="number"
+        android:maxLength="4"
+        android:textCursorDrawable="@null"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/ok"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/taskholder"
+        android:backgroundTint="@color/purple_500"
+        android:text="OK"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/cancel"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_custom_repeat_interval_value" />
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+
+        android:background="@drawable/taskholder"
+        android:backgroundTint="@color/purple_500"
+        android:text="@android:string/cancel"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_custom_repeat_interval_value" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
