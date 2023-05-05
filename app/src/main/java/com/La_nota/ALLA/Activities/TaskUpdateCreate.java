@@ -73,9 +73,22 @@ public class TaskUpdateCreate extends AppCompatActivity {
             params.width = 0;
             createBT.setLayoutParams(params);
 
+
+
             String date = i.getStringExtra(DATE_EXTRA);
             createBT.setOnClickListener(v -> onCreateTask(date));
         } else {
+            repetitionTV.setVisibility(View.GONE);
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) createBT.getLayoutParams();
+            params.topToBottom = R.id.descr;
+            params.endToEnd = R.id.descr;
+            createBT.setLayoutParams(params);
+
+            params = (ConstraintLayout.LayoutParams) deleteBT.getLayoutParams();
+            params.startToStart = R.id.descr;
+            params.topToBottom = R.id.descr;
+            deleteBT.setLayoutParams(params);
+
             createBT.setText(R.string.update);
             titleED.setText(data.getString(TASK_TITLE_EXTRA));
             descrED.setText(data.getString(TASK_DESCR_EXTRA));
@@ -114,7 +127,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
     private void onUpdateTask(int id) {
         String s = String.valueOf(titleED.getText());
         if (s.equals("")) {
-            Toast.makeText(this,getResources().getString(R.string.title) + getResources().getString(R.string.cant_be_empty), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.title) + getResources().getString(R.string.cant_be_empty), Toast.LENGTH_SHORT).show();
         } else {
             db.updateTask(id, s, frequency != 0);
             db.updateDescr(id, String.valueOf(descrED.getText()), frequency != 0);
@@ -136,7 +149,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
 
     public void onFrequencyDialogClick(int frequency) {
         this.frequency = frequency;
-        switch (frequency){
+        switch (frequency) {
             case 0:
             case 1:
                 repetitionTV.setText(repArray[frequency]);
