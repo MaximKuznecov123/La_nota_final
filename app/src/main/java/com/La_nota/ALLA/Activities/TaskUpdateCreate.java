@@ -1,6 +1,7 @@
 package com.La_nota.ALLA.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +20,11 @@ import com.La_nota.ALLA.Dialogs.EditTaskFrequency;
 import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
 import com.La_nota.ALLA.Database.TasksHandler2;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.Calendar;
+import java.util.Formatter;
 
 
 public class TaskUpdateCreate extends AppCompatActivity {
@@ -98,7 +104,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
     private void onCreateTask(String date) {
         String s = String.valueOf(titleED.getText());
         if (s.equals("")) {
-            Toast.makeText(this, R.string.title + R.string.cant_be_empty, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.title) + getResources().getString(R.string.cant_be_empty), Toast.LENGTH_SHORT).show();
         } else {
             TaskModel newtask = new TaskModel();
             newtask.setTitle(s);
@@ -114,7 +120,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
     private void onUpdateTask(int id) {
         String s = String.valueOf(titleED.getText());
         if (s.equals("")) {
-            Toast.makeText(this,R.string.title + R.string.cant_be_empty, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,getResources().getString(R.string.title) + getResources().getString(R.string.cant_be_empty), Toast.LENGTH_SHORT).show();
         } else {
             db.updateTask(id, s, frequency != 0);
             db.updateDescr(id, String.valueOf(descrED.getText()), frequency != 0);
@@ -134,7 +140,7 @@ public class TaskUpdateCreate extends AppCompatActivity {
         }
     }
 
-    public void onDialogClick(int frequency) {
+    public void onFrequencyDialogClick(int frequency) {
         this.frequency = frequency;
         switch (frequency){
             case 0:
@@ -147,10 +153,11 @@ public class TaskUpdateCreate extends AppCompatActivity {
                 repArray[4] = null;
                 break;
             default:
-                repArray[4] = getResources().getString(R.string.once_in_days) + frequency + getResources().getString(frequency > 4? R.string.dnei : R.string.dnia);
-                repetitionTV.setText(repArray[4]);
+                if (repArray[4] == null) {
+                    repArray[4] = getResources().getString(R.string.once_in_days) + frequency + getResources().getString(frequency > 4 ? R.string.dnei : R.string.dnia);
+                    repetitionTV.setText(repArray[4]);
+                }
                 break;
         }
     }
-
 }

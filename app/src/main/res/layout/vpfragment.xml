@@ -4,15 +4,6 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/taskSHlist"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@+id/ataskRecyclerList"
-        android:layout_alignParentBottom="true"
-        android:nestedScrollingEnabled="true"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
     <TextView
         android:id="@+id/curday"
         android:layout_width="189dp"
@@ -26,6 +17,18 @@
         android:textSize="32sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/taskswithrep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ataskRecyclerList"
+        android:layout_centerHorizontal="true"
+        android:text="@string/tasks_with_rep"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ataskRecyclerList"
         android:layout_width="match_parent"
@@ -33,9 +36,17 @@
         android:layout_below="@id/curday"
         android:layout_marginTop="1dp"
         android:nestedScrollingEnabled="true"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" >
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/taskSHlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/taskswithrep"
+        android:nestedScrollingEnabled="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 
 </RelativeLayout>

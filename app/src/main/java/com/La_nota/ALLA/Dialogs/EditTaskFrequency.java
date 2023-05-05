@@ -59,6 +59,7 @@ public class EditTaskFrequency extends DialogFragment {
                         (dialog, item) -> {
                             if (item == 3) {
                                 dismiss();
+
                                 makeOwnTaskFrequency();
                             } else {
                                 switch (item) {
@@ -70,7 +71,7 @@ public class EditTaskFrequency extends DialogFragment {
                                         frequency = 7;
                                         break;
                                 }
-                                ((TaskUpdateCreate) getActivity()).onDialogClick(frequency);
+                                ((TaskUpdateCreate) getActivity()).onFrequencyDialogClick(frequency);
                                 dismiss();
                             }
 
@@ -100,7 +101,8 @@ public class EditTaskFrequency extends DialogFragment {
                 Toast.makeText(activity, R.string.field + R.string.cant_be_empty, Toast.LENGTH_SHORT).show();
             } else {
                 int value = Integer.parseInt(s);
-                ((TaskUpdateCreate) activity).onDialogClick(value);
+                frequency = value;
+                ((TaskUpdateCreate) activity).onFrequencyDialogClick(value);
                 dialog.dismiss();
             }
         });

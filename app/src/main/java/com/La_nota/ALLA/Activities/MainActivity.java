@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
         if (sh.contains(date)) {
             TasksHandler2 db = new TasksHandler2(this);
             db.openDB();
-            //todo удалить потом
-            db.deleteAll();
             if (sh.getString(date, "").equals(today)) {
                 return;
             } else {

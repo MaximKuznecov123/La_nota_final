@@ -31,4 +31,5 @@
     <string name="dnia">" days"</string>
     <string name="dnei">" days"</string>
     <string name="field">This field</string>
+    <string name="tasks_with_rep">Tasks with repetition</string>
 </resources>

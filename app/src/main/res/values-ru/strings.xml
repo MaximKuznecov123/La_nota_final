@@ -30,4 +30,5 @@
     <string name="dnia">" дня"</string>
     <string name="dnei">" дней"</string>
     <string name="field">Это поле</string>
+    <string name="tasks_with_rep">Задания с повторением</string>
 </resources>
