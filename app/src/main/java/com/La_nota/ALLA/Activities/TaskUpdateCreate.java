@@ -1,7 +1,6 @@
 package com.La_nota.ALLA.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,15 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 
+import com.La_nota.ALLA.Database.TasksHandler2;
 import com.La_nota.ALLA.Dialogs.EditTaskFrequency;
 import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Database.TasksHandler2;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoField;
-import java.util.Calendar;
-import java.util.Formatter;
 
 
 public class TaskUpdateCreate extends AppCompatActivity {

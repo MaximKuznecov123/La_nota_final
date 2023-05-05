@@ -3,7 +3,6 @@ package com.La_nota.ALLA.Adapters;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.La_nota.ALLA.Activities.TaskUpdateCreate;
+import com.La_nota.ALLA.Database.TasksHandler2;
 import com.La_nota.ALLA.Models.TaskModel;
 import com.La_nota.ALLA.R;
-import com.La_nota.ALLA.Database.TasksHandler2;
 
 import java.util.List;
 import java.util.Random;
@@ -69,9 +68,7 @@ public class TaskAdapter2 extends RecyclerView.Adapter<TaskAdapter2.ViewHolder> 
             db.updateStatus(date, item.getID(), isChecked?1:0);
         });
 
-        holder.view.setOnClickListener((v) -> {
-            editItem(position);
-        });
+        holder.view.setOnClickListener((v) -> editItem(position));
     }
 
 

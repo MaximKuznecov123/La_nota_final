@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.La_nota.ALLA.Activities.MainActivity;
 import com.La_nota.ALLA.Interfaces.TaskOperator;
